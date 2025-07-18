@@ -129,7 +129,7 @@
           <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6">
             Dati e Diagnosi
           </h2>
-          <div class="grid grid-cols-1 gap-6 my-6">
+          <div class="grid grid-cols-1 my-6 gap-6">
             <!-- Campo Disabilità (Multiselect Ricercabile) -->
             <div>
               <label for="disabilita" class="form-label"
@@ -162,7 +162,6 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Campo Data di inizio (DatePicker) -->
             <div>
               <label for="data_inizio" class="form-label">Data di inizio</label>
               <input
@@ -232,9 +231,9 @@
                   >Attività</label
                 >
                 <select id="attivita" name="attivita" class="form-select">
-                  <option>Visita Fisiatrica</option>
                   <option>Valutazione Logopedica</option>
-                  <option>Colloquio Psicologico</option>
+                  <option>Valutazione Neuromotoria</option>
+                  <option>Valutazione Ortottica</option>
                 </select>
               </div>
               <div>
@@ -242,17 +241,17 @@
                   >Prodotto</label
                 >
                 <select id="prodotto" name="prodotto" class="form-select">
-                  <option>Prodotto A</option>
-                  <option>Prodotto B</option>
-                  <option>Prodotto C</option>
+                  <option>Base</option>
+                  <option>Avanzata</option>
                 </select>
               </div>
               <div class="self-end">
                 <button
                   type="button"
+                  id="save-evaluation-btn"
                   class="w-full px-4 py-2.5 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition-colors"
                 >
-                  Salva Valutazione
+                  Crea Valutazione
                 </button>
               </div>
             </div>
@@ -289,7 +288,10 @@
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody
+                id="evaluations-tbody"
+                class="bg-white divide-y divide-gray-200"
+              >
                 <!-- Esempio riga: Programmata -->
                 <tr>
                   <td
@@ -348,21 +350,25 @@
             <h2 class="text-xl font-semibold text-gray-700">
               Anamnesi e Valutazione
             </h2>
-
             <svg
               id="anamnesi-chevron"
               xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
-              fill="#5f6368"
+              class="h-6 w-6 text-gray-500 transition-transform duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
             >
-              <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
           <!-- Contenuto Collassabile -->
-          <div id="anamnesi-content" class="mt-6 space-y-6">
+          <div id="anamnesi-content" class="hidden mt-6 space-y-6">
             <!-- Anamnesi Familiare -->
             <div>
               <label for="anamnesi_familiare" class="form-label"
@@ -480,34 +486,77 @@
     </div>
 
     <script>
-      // Script per gestire la visualizzazione del form di aggiunta valutazione
-      const addEvaluationBtn = document.getElementById("add-evaluation-btn");
-      const newEvaluationForm = document.getElementById("new-evaluation-form");
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- GESTIONE ELEMENTI DEL DOM ---
+        const addEvaluationBtn = document.getElementById("add-evaluation-btn");
+        const newEvaluationForm = document.getElementById(
+          "new-evaluation-form"
+        );
+        const saveEvaluationBtn = document.getElementById(
+          "save-evaluation-btn"
+        );
+        const evaluationsTbody = document.getElementById("evaluations-tbody");
+        const attivitaSelect = document.getElementById("attivita");
+        const prodottoSelect = document.getElementById("prodotto");
+        const anamnesiHeader = document.getElementById("anamnesi-header");
+        const anamnesiContent = document.getElementById("anamnesi-content");
+        const anamnesiChevron = document.getElementById("anamnesi-chevron");
 
-      addEvaluationBtn.addEventListener("click", () => {
-        newEvaluationForm.classList.toggle("hidden");
-      });
+        // --- INIZIALIZZAZIONE ---
 
-      // Inizializzazione di Tom Select per il campo disabilità
-      new TomSelect("#disabilita", {
-        plugins: ["remove_button"],
-        placeholder: "Cerca o seleziona una o più disabilità...",
-        // Non permettere la creazione di nuove opzioni
-        create: false,
-      });
+        // Inizializzazione di Tom Select per il campo disabilità
+        new TomSelect("#disabilita", {
+          plugins: ["remove_button"],
+          placeholder: "Cerca o seleziona una o più disabilità...",
+          create: false,
+        });
 
-      // Script per la sezione Anamnesi collassabile
-      const anamnesiHeader = document.getElementById("anamnesi-header");
-      const anamnesiContent = document.getElementById("anamnesi-content");
-      const anamnesiChevron = document.getElementById("anamnesi-chevron");
+        // Inizializzazione sezione Anamnesi collassata
+        anamnesiContent.classList.add("hidden");
+        anamnesiChevron.classList.remove("rotate-180");
 
-      // Inizia la sezione collassata
-      anamnesiContent.classList.add("hidden");
-      anamnesiChevron.classList.remove("rotate-180");
+        // --- EVENT LISTENERS ---
 
-      anamnesiHeader.addEventListener("click", () => {
-        anamnesiContent.classList.toggle("hidden");
-        anamnesiChevron.classList.toggle("rotate-180");
+        // Mostra/nasconde il form per aggiungere una nuova valutazione
+        addEvaluationBtn.addEventListener("click", () => {
+          newEvaluationForm.classList.toggle("hidden");
+        });
+
+        // Logica per salvare la nuova valutazione
+        saveEvaluationBtn.addEventListener("click", () => {
+          const attivitaValue = attivitaSelect.value;
+
+          // Crea la nuova riga della tabella
+          const newRow = document.createElement("tr");
+          newRow.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${attivitaValue}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            DA PROGRAMMARE
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                `;
+
+          // Aggiunge la nuova riga al corpo della tabella
+          evaluationsTbody.appendChild(newRow);
+
+          // Reset e nascondi il form per una migliore UX
+          attivitaSelect.selectedIndex = 0;
+          prodottoSelect.selectedIndex = 0;
+          newEvaluationForm.classList.add("hidden");
+        });
+
+        // Gestisce la sezione Anamnesi collassabile
+        anamnesiHeader.addEventListener("click", () => {
+          const isHidden = anamnesiContent.classList.toggle("hidden");
+          if (isHidden) {
+            anamnesiChevron.classList.remove("rotate-180");
+          } else {
+            anamnesiChevron.classList.add("rotate-180");
+          }
+        });
       });
     </script>
   </body>
