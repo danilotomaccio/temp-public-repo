@@ -1,101 +1,29 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Modulo Anamnesi Paziente</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tom Select (per multiselect ricercabile) -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
-    <style>
-        /* Stile personalizzato per coerenza con l'immagine */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; 
-        }
-        /* Colore primario ispirato all'immagine */
-        .primary-color {
-            color: #8c2d52;
-        }
-        .bg-primary-color {
-            background-color: #8c2d52;
-        }
-        .border-primary-color {
-            border-color: #8c2d52;
-        }
-        /* Stile per i campi del modulo */
-        .form-input, .form-textarea, .form-select, .form-multiselect {
-            border-radius: 0.5rem;
-            border: 1px solid #d1d5db; /* Bordo grigio */
-            padding: 0.75rem 1rem;
-            width: 100%;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background-color: #fff;
-        }
-        .form-input:focus, .form-textarea:focus, .form-select:focus, .form-multiselect:focus {
-            outline: none;
-            border-color: #8c2d52;
-            box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2);
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151; /* Testo grigio scuro */
-        }
-        /* Stile per il datepicker per mostrare l'icona del calendario */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            opacity: 0.6;
-            filter: invert(0.5) sepia(1) saturate(5) hue-rotate(300deg);
-        }
-
-        /* Stili per allineare Tom Select con Tailwind */
-        .ts-control {
-            border-radius: 0.5rem !important;
-            border: 1px solid #d1d5db !important;
-            padding: 0.5rem 0.75rem !important;
-        }
-        .ts-control.focus {
-            outline: none !important;
-            border-color: #8c2d52 !important;
-            box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2) !important;
-        }
-        .ts-control .item {
-            background-color: #8c2d52;
-            color: white;
-            border-radius: 0.375rem;
-            font-weight: 500;
-        }
-        .ts-dropdown {
-            border-radius: 0.5rem;
-            border-color: #d1d5db;
-        }
-        .completed-evaluation-row {
-            cursor: pointer;
-        }
-        .evaluation-details-row > td {
-            padding: 0;
-        }
-    </style>
-</head>
-<body>
-
-    <ul>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <ul>
         <li>
-            <a href="./visita">Valutazione</a>
+          <a class="text-2xl text-blue-600 underline" href="./visita">Visita</a>
         </li>
         <li>
-            <a href="./colloquio">Colloquio</a>
+          <a class="text-2xl text-blue-600 underline" href="./colloquio">Colloquio</a>
         </li>
-    </ul>
-
-</body>
+      </ul>
+    </div>
+  </body>
 </html>
