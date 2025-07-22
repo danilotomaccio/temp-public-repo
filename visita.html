@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modulo Anamnesi Paziente</title>
+    <title>Modulo Visita Medica</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -98,23 +98,42 @@
       }
     </style>
   </head>
-  <body>
-    <div class="flex h-screen bg-gray-100">
-      <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto p-6 md:p-10">
-        <div
-          class="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
-        >
-          <!-- Intestazione del modulo -->
-          <div class="p-6 border-b border-gray-200 relative">
-            <h1 class="text-2xl font-bold text-gray-800">Visita Medica</h1>
-            <p class="text-gray-500 mt-1">
-              Compila i campi riguardanti la visita medica del paziente.
-            </p>
-          </div>
+  <body class="bg-gray-100 p-6 md:p-10">
+    <div
+      class="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
+    >
+      <!-- Intestazione del modulo -->
+      <div class="p-6 border-b border-gray-200 relative">
+        <h1 id="modal-title" class="text-2xl font-bold text-gray-800">Visita Medica</h1>
+        <p id="modal-description" class="text-gray-500 mt-1">
+          Compila i campi riguardanti la visita medica del paziente.
+        </p>
+      </div>
 
-          <!-- Contenuto del modulo -->
-          <form class="p-6 md:p-8 space-y-8">
+      <!-- Stepper -->
+      <div class="p-6 md:px-8 pt-8">
+          <div class="flex items-center">
+              <!-- Step 1 -->
+              <div id="stepper-item-1" class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-color text-white font-bold text-lg transition-colors duration-300">
+                 <span class="step-number">1</span>
+                 <svg class="step-check hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+              </div>
+              <!-- Linea -->
+              <div id="stepper-line-1" class="flex-auto border-t-2 border-gray-200 transition-colors duration-300 mx-4"></div>
+              <!-- Step 2 -->
+              <div id="stepper-item-2" class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-500 font-bold text-lg transition-colors duration-300">
+                  <span class="step-number">2</span>
+                  <svg class="step-check hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+              </div>
+          </div>
+      </div>
+
+      <!-- Contenuto del modulo -->
+      <form class="p-6 md:p-8 pt-4 space-y-8">
+        
+        <!-- Step 1: Dati Visita -->
+        <div id="step-1">
+          <div class="space-y-8">
             <!-- Sezione Dati e Diagnosi -->
             <div>
               <h2
@@ -541,87 +560,186 @@
                 </div>
               </div>
             </div>
-
-            <!-- <div>
-                <h2 class="text-lg font-semibold text-gray-700 pb-2 mb-6 pt-8 border-t">Allegati</h2>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                    <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex text-sm text-gray-600">
-                            <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                <span>Carica un file</span>
-                                <input id="file-upload" name="file-upload" type="file" class="sr-only">
-                            </label>
-                            <p class="pl-1">o trascina</p>
-                        </div>
-                        <p class="text-xs text-gray-500">
-                            PNG, JPG, PDF fino a 10MB
-                        </p>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Pulsanti di azione -->
-            <div
-              class="flex justify-end items-center pt-6 border-t border-gray-200"
-            >
-              <button
-                type="button"
-                class="px-6 py-2.5 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Annulla
-              </button>
-              <button
-                type="submit"
-                class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
-              >
-                Salva Dati
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </main>
+        
+        <!-- Step 2: Restituzione -->
+        <div id="step-2" class="hidden">
+           <div class="space-y-8">
+              <div>
+                  <h2 class="text-xl font-semibold text-gray-700">Indicazione passaggio successivo</h2>
+                  <p class="text-gray-500 mt-1">Decidi ciò che avverrà dopo la chiusura di questo appuntamento</p>
+              </div>
+              <div class="space-y-6 pt-4">
+                   <div>
+                      <label for="conclusione" class="form-label text-primary-color font-semibold">Conclusioni</label>
+                      <select id="conclusione" name="conclusione" class="form-select">
+                          <option value="" disabled selected>Cosa farà seguito a questa visita?</option>
+                          <option value="nuova_visita">Programma nuova visita</option>
+                          <option value="nuovo_colloquio">Programma nuovo colloquio</option>
+                          <option value="fine_percorso">Termina percorso</option>
+                      </select>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                          <label for="attivita_restituzione" class="form-label">Seleziona Attività <span class="text-red-500">*</span></label>
+                          <select id="attivita_restituzione" name="attivita_restituzione" class="form-select" required>
+                              <option value="" disabled selected>Scegli un'attività</option>
+                              <option value="logopedia">Logopedia</option>
+                              <option value="neuromotoria">Neuromotoria</option>
+                              <option value="supporto_psicologico">Supporto Psicologico</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label for="tariffa_restituzione" class="form-label">Seleziona Tariffa <span class="text-red-500">*</span></label>
+                          <select id="tariffa_restituzione" name="tariffa_restituzione" class="form-select" required>
+                               <option value="" disabled selected>Scegli una tariffa</option>
+                              <option value="standard">Standard</option>
+                              <option value="convenzionata">Convenzionata</option>
+                              <option value="esente">Esente</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+        <!-- Pulsanti di azione -->
+        <div
+          class="flex justify-end items-center pt-6 border-t border-gray-200"
+        >
+          <button
+            type="button"
+            id="prev-btn"
+            class="px-6 py-2.5 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-colors"
+          >
+            Indietro
+          </button>
+          <button
+            type="button"
+            id="next-btn"
+            class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
+          >
+            Avanti
+          </button>
+           <button
+            type="submit"
+            id="submit-btn"
+            class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
+          >
+            Salva ed Esci
+          </button>
+        </div>
+      </form>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // --- GESTIONE ELEMENTI DEL DOM ---
         const addEvaluationBtn = document.getElementById("add-evaluation-btn");
-        const newEvaluationForm = document.getElementById(
-          "new-evaluation-form"
-        );
-        const saveEvaluationBtn = document.getElementById(
-          "save-evaluation-btn"
-        );
+        const newEvaluationForm = document.getElementById("new-evaluation-form");
+        const saveEvaluationBtn = document.getElementById("save-evaluation-btn");
         const evaluationsTbody = document.getElementById("evaluations-tbody");
         const attivitaSelect = document.getElementById("attivita");
         const prodottoSelect = document.getElementById("prodotto");
         const anamnesiHeader = document.getElementById("anamnesi-header");
         const anamnesiContent = document.getElementById("anamnesi-content");
         const anamnesiChevron = document.getElementById("anamnesi-chevron");
-        const valutationHeader = document.getElementById("valutation-header");
-
         const evaluationsHeader = document.getElementById("evaluations-header");
         const evaluationsContent = document.getElementById("evaluations-content");
         const evaluationsChevron = document.getElementById("evaluations-chevron");
+        
+        // --- STEPPER ---
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const steps = [document.getElementById('step-1'), document.getElementById('step-2')];
+        const stepperItems = [document.getElementById('stepper-item-1'), document.getElementById('stepper-item-2')];
+        const stepperLines = [document.getElementById('stepper-line-1')];
+        let currentStep = 1;
+
+        const stepTitles = ["Visita Medica", "Restituzione"];
+        const stepDescriptions = [
+            "Compila i campi riguardanti la visita medica del paziente.",
+            "Compila i campi riguardanti la restituzione programmata"
+        ];
+
+        function updateStepUI() {
+            // Aggiorna contenuto modale
+            modalTitle.textContent = stepTitles[currentStep - 1];
+            modalDescription.textContent = stepDescriptions[currentStep - 1];
+
+            // Mostra/nascondi steps
+            steps.forEach((step, index) => {
+                step.classList.toggle('hidden', index + 1 !== currentStep);
+            });
+
+            // Aggiorna UI stepper
+            stepperItems.forEach((item, index) => {
+                const stepNumber = item.querySelector('.step-number');
+                const stepCheck = item.querySelector('.step-check');
+
+                if (index < currentStep - 1) { // Step completato
+                    item.classList.add('bg-primary-color');
+                    item.classList.remove('bg-gray-200', 'text-gray-500');
+                    stepNumber.classList.add('hidden');
+                    stepCheck.classList.remove('hidden');
+                } else if (index === currentStep - 1) { // Step attivo
+                    item.classList.add('bg-primary-color', 'text-white');
+                    item.classList.remove('bg-gray-200', 'text-gray-500');
+                    stepNumber.classList.remove('hidden');
+                    stepCheck.classList.add('hidden');
+                } else { // Step futuro
+                    item.classList.remove('bg-primary-color', 'text-white');
+                    item.classList.add('bg-gray-200', 'text-gray-500');
+                    stepNumber.classList.remove('hidden');
+                    stepCheck.classList.add('hidden');
+                }
+            });
+            
+            // Aggiorna linea stepper
+            stepperLines.forEach((line, index) => {
+               line.classList.toggle('border-primary-color', index < currentStep - 1);
+               line.classList.toggle('border-gray-200', index >= currentStep - 1);
+            });
+
+            // Aggiorna visibilità pulsanti
+            prevBtn.classList.toggle('hidden', currentStep === 1);
+            nextBtn.classList.toggle('hidden', currentStep === steps.length);
+            submitBtn.classList.toggle('hidden', currentStep !== steps.length);
+        }
 
         // --- INIZIALIZZAZIONE ---
-
         new TomSelect("#disabilita", {
           plugins: ["remove_button"],
           placeholder: "Cerca o seleziona una o più disabilità...",
           create: false,
         });
-
+        
         anamnesiContent.classList.add("hidden");
         anamnesiChevron.classList.remove("rotate-180");
         evaluationsContent.classList.add("hidden");
         evaluationsChevron.classList.remove("rotate-180");
+        
+        updateStepUI(); // Imposta lo stato iniziale
 
         // --- EVENT LISTENERS ---
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < steps.length) {
+                currentStep++;
+                updateStepUI();
+            }
+        });
 
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepUI();
+            }
+        });
+        
         addEvaluationBtn.addEventListener("click", () => {
           newEvaluationForm.classList.toggle("hidden");
         });
