@@ -1,427 +1,706 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Modulo Colloquio</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Tom Select (per multiselect ricercabile) -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     <style>
-        /* Stile personalizzato */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; 
-        }
-        /* Colore primario */
-        .primary-color {
-            color: #8c2d52;
-        }
-        .bg-primary-color {
-            background-color: #8c2d52;
-        }
-        /* Stile per i campi del modulo */
-        .form-input, .form-textarea, .form-select, .form-multiselect {
-            border-radius: 0.5rem;
-            border: 1px solid #d1d5db;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background-color: #fff;
-        }
-        .form-input:focus, .form-textarea:focus, .form-select:focus, .form-multiselect:focus {
-            outline: none;
-            border-color: #8c2d52;
-            box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2);
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        
-        /* Stili per Tom Select */
-        .ts-control {
-            border-radius: 0.5rem !important;
-            border: 1px solid #d1d5db !important;
-            padding: 0.5rem 0.75rem !important;
-        }
-        .ts-control.focus {
-            outline: none !important;
-            border-color: #8c2d52 !important;
-            box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2) !important;
-        }
-        .ts-control .item {
-            background-color: #8c2d52;
-            color: white;
-            border-radius: 0.375rem;
-            font-weight: 500;
-        }
-        .ts-dropdown {
-            border-radius: 0.5rem;
-            border-color: #d1d5db;
-        }
-        .completed-evaluation-row {
-            cursor: pointer;
-        }
-        .evaluation-details-row > td {
-            padding: 0;
-        }
+      /* Stile personalizzato */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fa;
+      }
+      /* Colore primario */
+      .primary-color {
+        color: #8c2d52;
+      }
+      .bg-primary-color {
+        background-color: #8c2d52;
+      }
+      /* Stile per i campi del modulo */
+      .form-input,
+      .form-textarea,
+      .form-select,
+      .form-multiselect {
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background-color: #fff;
+      }
+      .form-input:focus,
+      .form-textarea:focus,
+      .form-select:focus,
+      .form-multiselect:focus {
+        outline: none;
+        border-color: #8c2d52;
+        box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2);
+      }
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+      }
+
+      /* Stili per Tom Select */
+      .ts-control {
+        border-radius: 0.5rem !important;
+        border: 1px solid #d1d5db !important;
+        padding: 0.5rem 0.75rem !important;
+      }
+      .ts-control.focus {
+        outline: none !important;
+        border-color: #8c2d52 !important;
+        box-shadow: 0 0 0 2px rgba(140, 45, 82, 0.2) !important;
+      }
+      .ts-control .item {
+        background-color: #8c2d52;
+        color: white;
+        border-radius: 0.375rem;
+        font-weight: 500;
+      }
+      .ts-dropdown {
+        border-radius: 0.5rem;
+        border-color: #d1d5db;
+      }
+      .completed-evaluation-row {
+        cursor: pointer;
+      }
+      .evaluation-details-row > td {
+        padding: 0;
+      }
     </style>
-</head>
-<body class="bg-gray-100 p-6 md:p-10">
+  </head>
+  <body class="bg-gray-100 p-6 md:p-10">
+    <div
+      class="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
+    >
+      <!-- Intestazione del modulo -->
+      <div class="p-6 border-b border-gray-200 relative">
+        <h1 id="modal-title" class="text-2xl font-bold text-gray-800">
+          Colloquio
+        </h1>
+        <p id="modal-description" class="text-gray-500 mt-1">
+          Compila i campi riguardanti il colloquio del paziente.
+        </p>
+      </div>
 
-    <div class="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <!-- Intestazione del modulo -->
-        <div class="p-6 border-b border-gray-200 relative">
-            <h1 id="modal-title" class="text-2xl font-bold text-gray-800">Colloquio</h1>
-            <p id="modal-description" class="text-gray-500 mt-1">Compila i campi riguardanti il colloquio del paziente.</p>
+      <!-- Stepper -->
+      <div class="p-6 md:px-8 pt-8">
+        <div class="flex items-center">
+          <!-- Step 1 -->
+          <div
+            id="stepper-item-1"
+            class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-color text-white font-bold text-lg transition-colors duration-300"
+          >
+            <span class="step-number">1</span>
+            <svg
+              class="step-check hidden w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 12.75 6 6 9-13.5"
+              />
+            </svg>
+          </div>
+          <!-- Linea -->
+          <div
+            id="stepper-line-1"
+            class="flex-auto border-t-2 border-gray-200 transition-colors duration-300 mx-4"
+          ></div>
+          <!-- Step 2 -->
+          <div
+            id="stepper-item-2"
+            class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-500 font-bold text-lg transition-colors duration-300"
+          >
+            <span class="step-number">2</span>
+            <svg
+              class="step-check hidden w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 12.75 6 6 9-13.5"
+              />
+            </svg>
+          </div>
         </div>
+      </div>
 
-        <!-- Stepper -->
-        <div class="p-6 md:px-8 pt-8">
-            <div class="flex items-center">
-                <!-- Step 1 -->
-                <div id="stepper-item-1" class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-color text-white font-bold text-lg transition-colors duration-300">
-                   <span class="step-number">1</span>
-                   <svg class="step-check hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+      <!-- Contenuto del modulo -->
+      <form class="p-6 md:p-8 pt-4 space-y-8">
+        <!-- Step 1: Dati Colloquio -->
+        <div id="step-1">
+          <div class="space-y-8">
+            <!-- Sezione Dati Principali -->
+            <div>
+              <h2
+                class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6"
+              >
+                Dettagli Colloquio
+              </h2>
+              <div class="grid grid-cols-1 my-6 gap-6">
+                <!-- Campo Aree d'intervento (Multiselect Ricercabile) -->
+                <div>
+                  <label for="aree_intervento" class="form-label"
+                    >Aree d'intervento
+                    <span class="text-red-500">*</span></label
+                  >
+                  <select
+                    id="aree_intervento"
+                    name="aree_intervento[]"
+                    multiple
+                    required
+                  >
+                    <option value="neuropsichiatria_infantile">
+                      Neuropsichiatria infantile
+                    </option>
+                    <option value="consulenze_scolastiche">
+                      Consulenze scolastiche
+                    </option>
+                    <option value="neurologia">Neurologia</option>
+                    <option value="ortottica">Ortottica</option>
+                    <option value="logopedia">Logopedia</option>
+                    <option value="neuropsicomotricita">
+                      Neuropsicomotricità
+                    </option>
+                    <option value="terapia_occupazionale">
+                      Terapia occupazionale
+                    </option>
+                    <option value="neuromotoria">Neuromotoria</option>
+                    <option value="psicologia">Psicologia</option>
+                    <option value="terapia_aba">
+                      Terapia Cognitivo Comportamentale ABA
+                    </option>
+                    <option value="servizi_psicopedagogici">
+                      Servizi Psico-Pedagogici
+                    </option>
+                    <option value="fisiochinesiterapia">
+                      Fisiochinesiterapia
+                    </option>
+                  </select>
                 </div>
-                <!-- Linea -->
-                <div id="stepper-line-1" class="flex-auto border-t-2 border-gray-200 transition-colors duration-300 mx-4"></div>
-                <!-- Step 2 -->
-                <div id="stepper-item-2" class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-500 font-bold text-lg transition-colors duration-300">
-                    <span class="step-number">2</span>
-                    <svg class="step-check hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+
+                <!-- Campo Note (Textarea) -->
+                <div>
+                  <label for="note" class="form-label">Note</label>
+                  <textarea
+                    id="note"
+                    name="note"
+                    class="form-textarea"
+                    rows="4"
+                    placeholder="Inserire eventuali note..."
+                  ></textarea>
                 </div>
+              </div>
             </div>
-        </div>
 
-        <!-- Contenuto del modulo -->
-        <form class="p-6 md:p-8 pt-4 space-y-8">
-            
-            <!-- Step 1: Dati Colloquio -->
-            <div id="step-1">
-                <div class="space-y-8">
-                    <!-- Sezione Dati Principali -->
+            <!-- Componente Valutazioni Specialistiche (Collassabile) -->
+            <div>
+              <div
+                id="evaluations-header"
+                class="flex justify-between items-center cursor-pointer border-t border-gray-200 pt-8"
+              >
+                <h2 class="text-xl font-semibold text-gray-700">
+                  Valutazioni Specialistiche
+                </h2>
+                <svg
+                  id="evaluations-chevron"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-gray-500 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              <div id="evaluations-content" class="hidden mt-6 space-y-4">
+                <div class="flex justify-end items-center">
+                  <button
+                    type="button"
+                    id="add-evaluation-btn"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity text-sm shadow"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                      />
+                    </svg>
+                    Aggiungi Valutazione
+                  </button>
+                </div>
+                <div
+                  id="new-evaluation-form"
+                  class="hidden p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4"
+                >
+                  <!-- ... form nuova valutazione ... -->
+                  <h4 class="font-medium text-gray-600">
+                    Nuova Valutazione Specialistica
+                  </h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6">Dettagli Colloquio</h2>
-                        <div class="grid grid-cols-1 my-6 gap-6">
-                            <!-- Campo Aree d'intervento (Multiselect Ricercabile) -->
-                            <div>
-                                <label for="aree_intervento" class="form-label">Aree d'intervento <span class="text-red-500">*</span></label>
-                                <select id="aree_intervento" name="aree_intervento[]" multiple required>
-                                    <option value="neuropsichiatria_infantile">Neuropsichiatria infantile</option>
-                                    <option value="consulenze_scolastiche">Consulenze scolastiche</option>
-                                    <option value="neurologia">Neurologia</option>
-                                    <option value="ortottica">Ortottica</option>
-                                    <option value="logopedia">Logopedia</option>
-                                    <option value="neuropsicomotricita">Neuropsicomotricità</option>
-                                    <option value="terapia_occupazionale">Terapia occupazionale</option>
-                                    <option value="neuromotoria">Neuromotoria</option>
-                                    <option value="psicologia">Psicologia</option>
-                                    <option value="terapia_aba">Terapia Cognitivo Comportamentale ABA</option>
-                                    <option value="servizi_psicopedagogici">Servizi Psico-Pedagogici</option>
-                                    <option value="fisiochinesiterapia">Fisiochinesiterapia</option>
-                                </select>
-                            </div>
-
-                            <!-- Campo Note (Textarea) -->
-                            <div>
-                                <label for="note" class="form-label">Note</label>
-                                <textarea id="note" name="note" class="form-textarea" rows="4" placeholder="Inserire eventuali note..."></textarea>
-                            </div>
-                        </div>
+                      <label for="attivita" class="form-label text-sm"
+                        >Attività</label
+                      >
+                      <select id="attivita" name="attivita" class="form-select">
+                        <option>Valutazione Logopedica</option>
+                        <option>Valutazione Neuromotoria</option>
+                        <option>Valutazione Ortottica</option>
+                      </select>
                     </div>
-
-                    <!-- Componente Valutazioni Specialistiche (Collassabile) -->
                     <div>
-                        <div id="evaluations-header" class="flex justify-between items-center cursor-pointer border-t border-gray-200 pt-8">
-                            <h2 class="text-xl font-semibold text-gray-700">Valutazioni Specialistiche</h2>
-                            <svg id="evaluations-chevron" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                        <div id="evaluations-content" class="hidden mt-6 space-y-4">
-                            <div class="flex justify-end items-center">
-                                <button type="button" id="add-evaluation-btn" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity text-sm shadow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      <label for="prodotto" class="form-label text-sm"
+                        >Prodotto</label
+                      >
+                      <select id="prodotto" name="prodotto" class="form-select">
+                        <option>Base</option>
+                        <option>Avanzata</option>
+                      </select>
+                    </div>
+                    <div class="self-end">
+                      <button
+                        type="button"
+                        id="save-evaluation-btn"
+                        class="w-full px-4 py-2.5 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition-colors"
+                      >
+                        Crea Valutazione
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                  <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Nome
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Data
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Stato
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Operatore
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="evaluations-tbody"
+                      class="bg-white divide-y divide-gray-200"
+                    >
+                      <!-- Esempio riga: Programmata -->
+                      <tr class="hover:bg-gray-50">
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          Valutazione Neuromotoria
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          25/07/2025
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                          >
+                            PROGRAMMATA
+                          </span>
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          Dr. Rossi
+                        </td>
+                      </tr>
+                      <!-- Esempio riga: Completata (Espandibile) -->
+                      <tr class="completed-evaluation-row hover:bg-gray-50">
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          Valutazione Logopedica
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          15/07/2025
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                          >
+                            COMPLETATA
+                          </span>
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center justify-between"
+                        >
+                          <span>Dr. Bianchi</span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="details-chevron h-5 w-5 text-gray-400 transition-transform duration-300"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </td>
+                      </tr>
+                      <!-- Dettagli riga completata (nascosta) -->
+                      <tr class="evaluation-details-row hidden">
+                        <td colspan="4">
+                          <div class="bg-gray-50 p-4 md:p-6 space-y-4">
+                            <div>
+                              <h4 class="form-label text-sm">
+                                Report allegati
+                              </h4>
+                              <ul class="space-y-2">
+                                <li class="flex items-center">
+                                  <a
+                                    href="#"
+                                    class="flex items-center gap-3 text-blue-600 hover:underline"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      class="h-5 w-5 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                                      />
                                     </svg>
-                                    Aggiungi Valutazione
-                                </button>
-                            </div>
-                            <div id="new-evaluation-form" class="hidden p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
-                                <!-- ... form nuova valutazione ... -->
-                                <h4 class="font-medium text-gray-600">Nuova Valutazione Specialistica</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label for="attivita" class="form-label text-sm">Attività</label>
-                                        <select id="attivita" name="attivita" class="form-select">
-                                            <option>Valutazione Logopedica</option>
-                                            <option>Valutazione Neuromotoria</option>
-                                            <option>Valutazione Ortottica</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="prodotto" class="form-label text-sm">Prodotto</label>
-                                        <select id="prodotto" name="prodotto" class="form-select">
-                                            <option>Base</option>
-                                            <option>Avanzata</option>
-                                        </select>
-                                    </div>
-                                    <div class="self-end">
-                                        <button type="button" id="save-evaluation-btn" class="w-full px-4 py-2.5 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition-colors">
-                                            Crea Valutazione
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                                <table class="min-w-full">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Operatore</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="evaluations-tbody" class="bg-white divide-y divide-gray-200">
-                                        <!-- Esempio riga: Programmata -->
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Valutazione Neuromotoria</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25/07/2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            PROGRAMMATA
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Dr. Rossi</td>
-                                </tr>
-                                <!-- Esempio riga: Completata (Espandibile) -->
-                                <tr class="completed-evaluation-row hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Valutazione Logopedica</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/07/2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            COMPLETATA
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center justify-between">
-                                      <span>Dr. Bianchi</span>
-                                      <svg xmlns="http://www.w3.org/2000/svg" class="details-chevron h-5 w-5 text-gray-400 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                      </svg>
-                                    </td>
-                                </tr>
-                                <!-- Dettagli riga completata (nascosta) -->
-                                <tr class="evaluation-details-row hidden">
-                                    <td colspan="4">
-                                        <div class="bg-gray-50 p-4 md:p-6 space-y-4">
-                                            <div>
-                                                <h4 class="form-label text-sm">Report allegati</h4>
-                                                <ul class="space-y-2">
-                                                    <li class="flex items-center">
-                                                        <a href="#" class="flex items-center gap-3 text-blue-600 hover:underline">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                                                            <span>report_logopedico_072025.pdf</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <h4 class="form-label text-sm">Note</h4>
-                                                <div class="p-3 bg-white border rounded-md text-gray-700 text-sm">
-                                                    Il paziente ha mostrato notevoli miglioramenti nella fluidità verbale. Si consiglia di proseguire con gli esercizi assegnati e programmare un controllo fra 3 mesi.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Restituzione -->
-            <div id="step-2" class="hidden">
-                 <div class="space-y-8">
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-700">Indicazione passaggio successivo</h2>
-                        <p class="text-gray-500 mt-1">Decidi ciò che avverrà dopo la chiusura di questo appuntamento</p>
-                    </div>
-                    <div class="space-y-6 pt-4">
-                         <div>
-                            <label for="conclusione" class="form-label text-primary-color font-semibold">Conclusioni</label>
-                            <select id="conclusione" name="conclusione" class="form-select">
-                                <option value="" disabled selected>Cosa farà seguito a questo colloquio?</option>
-                                <option value="nuova_visita">Programma nuova visita</option>
-                                <option value="nuovo_colloquio">Programma nuovo colloquio</option>
-                                <option value="fine_percorso">Termina percorso</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="attivita_restituzione" class="form-label">Seleziona Attività <span class="text-red-500">*</span></label>
-                                <select id="attivita_restituzione" name="attivita_restituzione" class="form-select" required>
-                                    <option value="" disabled selected>Scegli un'attività</option>
-                                    <option value="logopedia">Logopedia</option>
-                                    <option value="neuromotoria">Neuromotoria</option>
-                                    <option value="supporto_psicologico">Supporto Psicologico</option>
-                                </select>
+                                    <span>report_logopedico_072025.pdf</span>
+                                  </a>
+                                </li>
+                              </ul>
                             </div>
                             <div>
-                                <label for="tariffa_restituzione" class="form-label">Seleziona Tariffa <span class="text-red-500">*</span></label>
-                                <select id="tariffa_restituzione" name="tariffa_restituzione" class="form-select" required>
-                                     <option value="" disabled selected>Scegli una tariffa</option>
-                                    <option value="standard">Standard</option>
-                                    <option value="convenzionata">Convenzionata</option>
-                                    <option value="esente">Esente</option>
-                                </select>
+                              <h4 class="form-label text-sm">Note</h4>
+                              <div
+                                class="p-3 bg-white border rounded-md text-gray-700 text-sm"
+                              >
+                                Il paziente ha mostrato notevoli miglioramenti
+                                nella fluidità verbale. Si consiglia di
+                                proseguire con gli esercizi assegnati e
+                                programmare un controllo fra 3 mesi.
+                              </div>
                             </div>
-                        </div>
-                    </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Pulsanti di azione -->
-            <div class="flex justify-end items-center pt-6 border-t border-gray-200">
-                <button type="button" id="prev-btn" class="px-6 py-2.5 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-colors">
-                    Indietro
-                </button>
-                <button type="button" id="next-btn" class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md">
-                    Avanti
-                </button>
-                <button type="submit" id="submit-btn" class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md">
-                    Salva ed Esci
-                </button>
+        <!-- Step 2: Restituzione -->
+        <div id="step-2" class="hidden">
+          <div class="space-y-8">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-700">
+                Indicazione passaggio successivo
+              </h2>
+              <p class="text-gray-500 mt-1">
+                Decidi ciò che avverrà dopo la chiusura di questo appuntamento
+              </p>
             </div>
-        </form>
+            <div class="space-y-6 pt-4">
+              <div>
+                <label
+                  for="conclusione"
+                  class="form-label text-primary-color font-semibold"
+                  >Conclusioni</label
+                >
+                <select id="conclusione" name="conclusione" class="form-select">
+                  <option value="" disabled selected>
+                    Cosa farà seguito a questo colloquio?
+                  </option>
+                  <option value="nuova_visita">Visita medica</option>
+                  <option value="nuovo_colloquio">Colloquio</option>
+                  <option value="nuovo_colloquio">Trattamento</option>
+                  <option value="nuovo_colloquio">Restituzione</option>
+                  <option value="fine_percorso">Termina percorso</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="attivita_restituzione" class="form-label"
+                    >Seleziona Attività
+                    <span class="text-red-500">*</span></label
+                  >
+                  <select
+                    id="attivita_restituzione"
+                    name="attivita_restituzione"
+                    class="form-select"
+                    required
+                  >
+                    <option value="" disabled selected>
+                      Scegli un'attività
+                    </option>
+                    <option value="logopedia">Logopedia</option>
+                    <option value="neuromotoria">Neuromotoria</option>
+                    <option value="supporto_psicologico">
+                      Supporto Psicologico
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label for="tariffa_restituzione" class="form-label"
+                    >Seleziona Tariffa
+                    <span class="text-red-500">*</span></label
+                  >
+                  <select
+                    id="tariffa_restituzione"
+                    name="tariffa_restituzione"
+                    class="form-select"
+                    required
+                  >
+                    <option value="" disabled selected>
+                      Scegli una tariffa
+                    </option>
+                    <option value="standard">Standard</option>
+                    <option value="convenzionata">Convenzionata</option>
+                    <option value="esente">Esente</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pulsanti di azione -->
+        <div
+          class="flex justify-end items-center pt-6 border-t border-gray-200"
+        >
+          <button
+            type="button"
+            id="prev-btn"
+            class="px-6 py-2.5 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-colors"
+          >
+            Indietro
+          </button>
+          <button
+            type="button"
+            id="next-btn"
+            class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
+          >
+            Avanti
+          </button>
+          <button
+            type="submit"
+            id="submit-btn"
+            class="ml-4 px-6 py-2.5 rounded-lg bg-primary-color text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
+          >
+            Salva ed Esci
+          </button>
+        </div>
+      </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- GESTIONE ELEMENTI DEL DOM ---
-            const addEvaluationBtn = document.getElementById('add-evaluation-btn');
-            const newEvaluationForm = document.getElementById('new-evaluation-form');
-            const saveEvaluationBtn = document.getElementById('save-evaluation-btn');
-            const evaluationsTbody = document.getElementById('evaluations-tbody');
-            const attivitaSelect = document.getElementById('attivita');
-            const prodottoSelect = document.getElementById('prodotto');
-            
-            const evaluationsHeader = document.getElementById('evaluations-header');
-            const evaluationsContent = document.getElementById('evaluations-content');
-            const evaluationsChevron = document.getElementById('evaluations-chevron');
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- GESTIONE ELEMENTI DEL DOM ---
+        const addEvaluationBtn = document.getElementById("add-evaluation-btn");
+        const newEvaluationForm = document.getElementById(
+          "new-evaluation-form"
+        );
+        const saveEvaluationBtn = document.getElementById(
+          "save-evaluation-btn"
+        );
+        const evaluationsTbody = document.getElementById("evaluations-tbody");
+        const attivitaSelect = document.getElementById("attivita");
+        const prodottoSelect = document.getElementById("prodotto");
 
-            // --- STEPPER ---
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const submitBtn = document.getElementById('submit-btn');
-            const steps = [document.getElementById('step-1'), document.getElementById('step-2')];
-            const stepperItems = [document.getElementById('stepper-item-1'), document.getElementById('stepper-item-2')];
-            const stepperLines = [document.getElementById('stepper-line-1')];
-            let currentStep = 1;
+        const evaluationsHeader = document.getElementById("evaluations-header");
+        const evaluationsContent = document.getElementById(
+          "evaluations-content"
+        );
+        const evaluationsChevron = document.getElementById(
+          "evaluations-chevron"
+        );
 
-            const stepTitles = ["Colloquio", "Restituzione"];
-            const stepDescriptions = [
-                "Compila i campi riguardanti il colloquio del paziente.",
-                "Compila i campi riguardanti la restituzione programmata"
-            ];
+        // --- STEPPER ---
+        const modalTitle = document.getElementById("modal-title");
+        const modalDescription = document.getElementById("modal-description");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        const steps = [
+          document.getElementById("step-1"),
+          document.getElementById("step-2"),
+        ];
+        const stepperItems = [
+          document.getElementById("stepper-item-1"),
+          document.getElementById("stepper-item-2"),
+        ];
+        const stepperLines = [document.getElementById("stepper-line-1")];
+        let currentStep = 1;
 
-            function updateStepUI() {
-                // Aggiorna contenuto modale
-                modalTitle.textContent = stepTitles[currentStep - 1];
-                modalDescription.textContent = stepDescriptions[currentStep - 1];
+        const stepTitles = ["Colloquio", "Restituzione"];
+        const stepDescriptions = [
+          "Compila i campi riguardanti il colloquio del paziente.",
+          "Compila i campi riguardanti la restituzione programmata",
+        ];
 
-                // Mostra/nascondi steps
-                steps.forEach((step, index) => {
-                    step.classList.toggle('hidden', index + 1 !== currentStep);
-                });
+        function updateStepUI() {
+          // Aggiorna contenuto modale
+          modalTitle.textContent = stepTitles[currentStep - 1];
+          modalDescription.textContent = stepDescriptions[currentStep - 1];
 
-                // Aggiorna UI stepper
-                stepperItems.forEach((item, index) => {
-                    const stepNumber = item.querySelector('.step-number');
-                    const stepCheck = item.querySelector('.step-check');
+          // Mostra/nascondi steps
+          steps.forEach((step, index) => {
+            step.classList.toggle("hidden", index + 1 !== currentStep);
+          });
 
-                    if (index < currentStep - 1) { // Step completato
-                        item.classList.add('bg-primary-color');
-                        item.classList.remove('bg-gray-200', 'text-gray-500');
-                        stepNumber.classList.add('hidden');
-                        stepCheck.classList.remove('hidden');
-                    } else if (index === currentStep - 1) { // Step attivo
-                        item.classList.add('bg-primary-color', 'text-white');
-                        item.classList.remove('bg-gray-200', 'text-gray-500');
-                        stepNumber.classList.remove('hidden');
-                        stepCheck.classList.add('hidden');
-                    } else { // Step futuro
-                        item.classList.remove('bg-primary-color', 'text-white');
-                        item.classList.add('bg-gray-200', 'text-gray-500');
-                        stepNumber.classList.remove('hidden');
-                        stepCheck.classList.add('hidden');
-                    }
-                });
-                
-                // Aggiorna linea stepper
-                stepperLines.forEach((line, index) => {
-                   line.classList.toggle('border-primary-color', index < currentStep - 1);
-                   line.classList.toggle('border-gray-200', index >= currentStep - 1);
-                });
+          // Aggiorna UI stepper
+          stepperItems.forEach((item, index) => {
+            const stepNumber = item.querySelector(".step-number");
+            const stepCheck = item.querySelector(".step-check");
 
-                // Aggiorna visibilità pulsanti
-                prevBtn.classList.toggle('hidden', currentStep === 1);
-                nextBtn.classList.toggle('hidden', currentStep === steps.length);
-                submitBtn.classList.toggle('hidden', currentStep !== steps.length);
+            if (index < currentStep - 1) {
+              // Step completato
+              item.classList.add("bg-primary-color");
+              item.classList.remove("bg-gray-200", "text-gray-500");
+              stepNumber.classList.add("hidden");
+              stepCheck.classList.remove("hidden");
+            } else if (index === currentStep - 1) {
+              // Step attivo
+              item.classList.add("bg-primary-color", "text-white");
+              item.classList.remove("bg-gray-200", "text-gray-500");
+              stepNumber.classList.remove("hidden");
+              stepCheck.classList.add("hidden");
+            } else {
+              // Step futuro
+              item.classList.remove("bg-primary-color", "text-white");
+              item.classList.add("bg-gray-200", "text-gray-500");
+              stepNumber.classList.remove("hidden");
+              stepCheck.classList.add("hidden");
             }
+          });
 
-            nextBtn.addEventListener('click', () => {
-                if (currentStep < steps.length) {
-                    currentStep++;
-                    updateStepUI();
-                }
-            });
+          // Aggiorna linea stepper
+          stepperLines.forEach((line, index) => {
+            line.classList.toggle(
+              "border-primary-color",
+              index < currentStep - 1
+            );
+            line.classList.toggle("border-gray-200", index >= currentStep - 1);
+          });
 
-            prevBtn.addEventListener('click', () => {
-                if (currentStep > 1) {
-                    currentStep--;
-                    updateStepUI();
-                }
-            });
+          // Aggiorna visibilità pulsanti
+          prevBtn.classList.toggle("hidden", currentStep === 1);
+          nextBtn.classList.toggle("hidden", currentStep === steps.length);
+          submitBtn.classList.toggle("hidden", currentStep !== steps.length);
+        }
 
-            // --- INIZIALIZZAZIONE ---
-            new TomSelect('#aree_intervento',{
-                plugins: ['remove_button'],
-                placeholder: 'Cerca o seleziona una o più aree...',
-                create: false 
-            });
+        nextBtn.addEventListener("click", () => {
+          if (currentStep < steps.length) {
+            currentStep++;
+            updateStepUI();
+          }
+        });
 
-            // Inizializza la sezione come collassata
-            evaluationsContent.classList.add('hidden');
-            evaluationsChevron.classList.remove('rotate-180');
-            updateStepUI(); // Imposta lo stato iniziale
+        prevBtn.addEventListener("click", () => {
+          if (currentStep > 1) {
+            currentStep--;
+            updateStepUI();
+          }
+        });
 
-            // --- EVENT LISTENERS ---
-            addEvaluationBtn.addEventListener('click', () => {
-                newEvaluationForm.classList.toggle('hidden');
-            });
+        // --- INIZIALIZZAZIONE ---
+        new TomSelect("#aree_intervento", {
+          plugins: ["remove_button"],
+          placeholder: "Cerca o seleziona una o più aree...",
+          create: false,
+        });
 
-            saveEvaluationBtn.addEventListener('click', () => {
-                const attivitaValue = attivitaSelect.value;
-                const newRow = document.createElement('tr');
-                newRow.classList.add('hover:bg-gray-50');
-                newRow.innerHTML = `
+        // Inizializza la sezione come collassata
+        evaluationsContent.classList.add("hidden");
+        evaluationsChevron.classList.remove("rotate-180");
+        updateStepUI(); // Imposta lo stato iniziale
+
+        // --- EVENT LISTENERS ---
+        addEvaluationBtn.addEventListener("click", () => {
+          newEvaluationForm.classList.toggle("hidden");
+        });
+
+        saveEvaluationBtn.addEventListener("click", () => {
+          const attivitaValue = attivitaSelect.value;
+          const newRow = document.createElement("tr");
+          newRow.classList.add("hover:bg-gray-50");
+          newRow.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${attivitaValue}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -431,32 +710,34 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
                 `;
-                evaluationsTbody.appendChild(newRow);
-                
-                attivitaSelect.selectedIndex = 0;
-                prodottoSelect.selectedIndex = 0;
-                newEvaluationForm.classList.add('hidden');
-            });
+          evaluationsTbody.appendChild(newRow);
 
-            evaluationsHeader.addEventListener('click', () => {
-                const isHidden = evaluationsContent.classList.toggle('hidden');
-                evaluationsChevron.classList.toggle('rotate-180', !isHidden);
-            });
-
-            evaluationsTbody.addEventListener('click', (event) => {
-                const row = event.target.closest('tr');
-                if (row && row.classList.contains('completed-evaluation-row')) {
-                    const detailsRow = row.nextElementSibling;
-                    const chevron = row.querySelector('.details-chevron');
-
-                    if (detailsRow && detailsRow.classList.contains('evaluation-details-row')) {
-                        detailsRow.classList.toggle('hidden');
-                        chevron.classList.toggle('rotate-180');
-                    }
-                }
-            });
+          attivitaSelect.selectedIndex = 0;
+          prodottoSelect.selectedIndex = 0;
+          newEvaluationForm.classList.add("hidden");
         });
-    </script>
 
-</body>
+        evaluationsHeader.addEventListener("click", () => {
+          const isHidden = evaluationsContent.classList.toggle("hidden");
+          evaluationsChevron.classList.toggle("rotate-180", !isHidden);
+        });
+
+        evaluationsTbody.addEventListener("click", (event) => {
+          const row = event.target.closest("tr");
+          if (row && row.classList.contains("completed-evaluation-row")) {
+            const detailsRow = row.nextElementSibling;
+            const chevron = row.querySelector(".details-chevron");
+
+            if (
+              detailsRow &&
+              detailsRow.classList.contains("evaluation-details-row")
+            ) {
+              detailsRow.classList.toggle("hidden");
+              chevron.classList.toggle("rotate-180");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
