@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo Restituzione Attività</title>
+    <!-- Tailwind CSS per lo stile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Stile personalizzato per una migliore esperienza di scrolling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="min-h-screen p-4 sm:p-8 flex items-center justify-center">
+      <div class="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg">
+            <div class="p-8">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Restituzione</h2>
+                        <p id="subtitle" class="text-gray-500 mt-1">Seleziona le attività da includere nella restituzione.</p>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Stepper -->
+                <div class="flex items-center justify-center my-8">
+                    <div id="step-indicator-1" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-[#8c2c4e]">1</div>
+                    <div id="step-line" class="w-24 h-0.5 bg-gray-300"></div>
+                    <div id="step-indicator-2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-gray-300">2</div>
+                </div>
+
+                <!-- Step 1: Selezione Attività -->
+                <div id="step-1-view">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Attività da visualizzare</h3>
+                    <div id="activity-selection-list" class="space-y-3 max-h-[50vh] overflow-y-auto p-1 custom-scrollbar">
+                        <!-- Le righe di selezione verranno inserite qui da JS -->
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button id="continue-button" disabled
+                            class="px-8 py-2.5 bg-[#8c2c4e] text-white font-semibold rounded-lg shadow-md hover:bg-[#7a2644] focus:outline-none focus:ring-2 focus:ring-[#8c2c4e] focus:ring-opacity-75 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200">
+                            Continua
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Overview Attività -->
+                <div id="step-2-view" class="hidden">
+                    <div id="activity-overview-container" class="max-h-[50vh] overflow-y-auto -m-2 p-2 custom-scrollbar">
+                        <!-- Le card di dettaglio verranno inserite qui da JS -->
+                    </div>
+                    
+                    <!-- Campo Commenti -->
+                    <div class="mt-8">
+                        <label for="commenti" class="block text-md font-semibold text-gray-700 mb-2">Commenti</label>
+                        <textarea id="commenti" name="commenti" rows="4" placeholder="Inserisci qui i tuoi commenti..." class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition"></textarea>
+                    </div>
+
+                    <!-- Contatore Allegati -->
+                    <div class="mt-4 text-right">
+                        <p id="attachments-counter" class="text-sm font-medium text-gray-700"></p>
+                    </div>
+
+                    <div class="mt-6 flex justify-between items-center">
+                        <button id="back-button"
+                            class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors duration-200">
+                            Indietro
+                        </button>
+                        <button
+                            class="px-8 py-2.5 bg-[#8c2c4e] text-white font-semibold rounded-lg shadow-md hover:bg-[#7a2644] focus:outline-none focus:ring-2 focus:ring-[#8c2c4e] focus:ring-opacity-75 transition-all duration-200">
+                            Salva Restituzione
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATI DI ESEMPIO ---
+        const sampleActivities = [
+          { id: 'v1', type: 'Visita', codice: 'VIS-2024-001', data: '2024-07-15', disabilita: ['Disturbo dello spettro autistico', 'ADHD'], diagnosi: 'La diagnosi iniziale suggerisce la necessità di un follow-up per determinare il percorso terapeutico più adeguato.', valutazioniSpecialistiche: [ { id: 'vs1', codice: 'VS-LOG-001', data: '2024-07-18', note: 'Valutazione logopedica per analizzare le capacità comunicative.', allegati: [{ nome: 'report_logopedico_1.pdf', url: '#' }], }, ], },
+          { id: 'c1', type: 'Colloquio', codice: 'COL-2024-001', data: '2024-07-16', areeIntervento: ['Gestione ansia', 'Supporto genitoriale'], note: 'Il colloquio ha evidenziato una forte necessità di supporto per la gestione dello stress familiare.', valutazioniSpecialistiche: [], },
+          { id: 'c2', type: 'Colloquio', codice: 'COL-2024-002', data: '2024-07-22', areeIntervento: ['Relazioni sociali'], note: 'Focus sulle difficoltà di interazione con i pari.', valutazioniSpecialistiche: [ { id: 'vs2', codice: 'VS-PSI-005', data: '2024-07-23', note: 'Test proiettivo per esplorare la sfera emotiva.', allegati: [{ nome: 'risultati_test.pdf', url: '#' }], }, { id: 'vs3', codice: 'VS-OBS-002', data: '2024-07-24', note: 'Osservazione comportamentale in ambiente strutturato.', allegati: [{ nome: 'scheda_osservazione.docx', url: '#' }], }, ], },
+          { id: 'v2', type: 'Visita', codice: 'VIS-2024-002', data: '2024-07-25', disabilita: ['Dislessia'], diagnosi: 'Controllo periodico. Si notano miglioramenti nella lettura.', valutazioniSpecialistiche: [], }
+        ];
+
+        // --- STATO DELL'APPLICAZIONE ---
+        let selectedActivityIds = [];
+        let selectedAssessmentIds = []; 
+
+        // --- RIFERIMENTI AL DOM ---
+        const step1View = document.getElementById('step-1-view');
+        const step2View = document.getElementById('step-2-view');
+        const activitySelectionList = document.getElementById('activity-selection-list');
+        const activityOverviewContainer = document.getElementById('activity-overview-container');
+        const continueButton = document.getElementById('continue-button');
+        const backButton = document.getElementById('back-button');
+        const subtitle = document.getElementById('subtitle');
+        const stepIndicator1 = document.getElementById('step-indicator-1');
+        const stepIndicator2 = document.getElementById('step-indicator-2');
+        const stepLine = document.getElementById('step-line');
+        const attachmentsCounter = document.getElementById('attachments-counter'); // Riferimento per il contatore
+
+        // --- FUNZIONI DI RENDERING ---
+
+        function createActivitySelectionRowHTML(activity) {
+            const isSelected = selectedActivityIds.includes(activity.id);
+            const typeColor = activity.type === 'Visita' ? 'bg-teal-100 text-teal-800' : 'bg-amber-100 text-amber-800';
+            const selectedClasses = isSelected ? 'bg-indigo-50 border-indigo-400 ring-2 ring-indigo-300' : 'bg-white border-gray-200 hover:bg-gray-50';
+            const formattedDate = new Date(activity.data).toLocaleDateString('it-IT');
+
+            let assessmentIndicatorHTML = '';
+            if (activity.valutazioniSpecialistiche && activity.valutazioniSpecialistiche.length > 0) {
+                const count = activity.valutazioniSpecialistiche.length;
+                const label = count === 1 ? 'valutazione' : 'valutazioni';
+                assessmentIndicatorHTML = `
+                    <div class="flex items-center text-xs text-sky-700 mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="font-medium">${count} ${label} presente/i</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <label for="activity-${activity.id}" data-id="${activity.id}" class="activity-row flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${selectedClasses}">
+                    <input id="activity-${activity.id}" type="checkbox" ${isSelected ? 'checked' : ''} class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded pointer-events-none">
+                    <div class="ml-4 flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase px-2 py-1 rounded-full ${typeColor}">${activity.type}</span>
+                            <span class="text-sm font-medium text-gray-800">${activity.codice}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Data: ${formattedDate}</p>
+                        ${assessmentIndicatorHTML}
+                    </div>
+                </label>
+            `;
+        }
+        
+        function createSpecialistAssessmentCardHTML(assessment) {
+            const formattedDate = new Date(assessment.data).toLocaleDateString('it-IT');
+            const isChecked = selectedAssessmentIds.includes(assessment.id);
+            const attachmentIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 inline-block text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>`;
+            
+            let attachmentsHTML = '';
+            if (assessment.allegati?.length > 0) {
+                attachmentsHTML = `<div class="mt-3"><ul class="list-none pl-0">${assessment.allegati.map(file => `
+                    <li class="mb-1"><a href="${file.url}" class="text-sm text-indigo-600 hover:underline hover:text-indigo-800 transition-colors duration-200 flex items-center">${attachmentIcon} ${file.nome}</a></li>`).join('')}</ul></div>`;
+            }
+
+            return `
+                <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mt-4 relative">
+                    <div class="absolute top-3 right-3">
+                        <input type="checkbox" data-assessment-id="${assessment.id}" class="assessment-checkbox h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-400 rounded" ${isChecked ? 'checked' : ''}>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">${assessment.codice} - ${formattedDate}</p>
+                    <p class="text-gray-800 pr-8">${assessment.note}</p>
+                    ${attachmentsHTML}
+                </div>`;
+        }
+
+        function createActivityDetailCardHTML(activity) {
+            const isVisita = activity.type === 'Visita';
+            const formattedDate = new Date(activity.data).toLocaleDateString('it-IT');
+            const tagClasses = "inline-block bg-sky-100 text-sky-800 text-sm font-medium mr-2 mb-2 px-2.5 py-0.5 rounded-full";
+            
+            let parentCheckboxHTML = '';
+            if (activity.valutazioniSpecialistiche?.length > 0) {
+                 parentCheckboxHTML = `
+                    <div class="absolute top-4 right-4" title="Seleziona/Deseleziona tutte le valutazioni annesse">
+                        <input type="checkbox" data-activity-id="${activity.id}" class="parent-checkbox h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-400 rounded">
+                    </div>`;
+            }
+
+            let assessmentsHTML = '';
+            if (activity.valutazioniSpecialistiche?.length > 0) {
+                assessmentsHTML = `<div class="mt-6 border-t border-gray-200 pt-4"><h4 class="text-lg font-semibold text-gray-700 mb-3">Valutazioni Specialistiche Annesse</h4>${activity.valutazioniSpecialistiche.map(createSpecialistAssessmentCardHTML).join('')}</div>`;
+            }
+
+            return `
+                <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm relative">
+                    ${parentCheckboxHTML}
+                    <h3 class="text-xl font-bold text-gray-800 mb-1">${activity.type}</h3>
+                    <p class="text-sm text-gray-500 mb-4">${activity.codice} - ${formattedDate}</p>
+                    ${isVisita ? `<div><h4 class="text-md font-semibold text-gray-700 mt-4 mb-2">Disabilità</h4><div class="flex flex-wrap">${activity.disabilita.map(item => `<span class="${tagClasses}">${item}</span>`).join('')}</div></div><div><h4 class="text-md font-semibold text-gray-700 mt-4 mb-2">Diagnosi</h4><p class="text-gray-600">${activity.diagnosi}</p></div>` : `<div><h4 class="text-md font-semibold text-gray-700 mt-4 mb-2">Aree d'intervento</h4><div class="flex flex-wrap">${activity.areeIntervento.map(item => `<span class="${tagClasses}">${item}</span>`).join('')}</div></div><div><h4 class="text-md font-semibold text-gray-700 mt-4 mb-2">Note</h4><p class="text-gray-600">${activity.note}</p></div>`}
+                    ${assessmentsHTML}
+                </div>`;
+        }
+        
+        function renderSelectionList() {
+            activitySelectionList.innerHTML = sampleActivities.map(createActivitySelectionRowHTML).join('');
+            document.querySelectorAll('.activity-row').forEach(row => {
+                row.addEventListener('click', () => handleActivitySelection(row.dataset.id));
+            });
+        }
+
+        function renderOverview() {
+            const selectedActivities = sampleActivities.filter(act => selectedActivityIds.includes(act.id));
+            activityOverviewContainer.innerHTML = selectedActivities.length > 0 ? selectedActivities.map(createActivityDetailCardHTML).join('') : '<p class="text-center text-gray-500">Nessuna attività selezionata.</p>';
+            
+            // Aggiorna il contatore degli allegati
+            const count = selectedAssessmentIds.length;
+            const label = count === 1 ? 'valutazione' : 'valutazioni';
+            attachmentsCounter.textContent = `Verranno allegate ${count} ${label}.`;
+
+            updateCheckboxesState();
+        }
+        
+        function updateCheckboxesState() {
+            document.querySelectorAll('.assessment-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => handleAssessmentSelection(e.target.dataset.assessmentId));
+            });
+
+            document.querySelectorAll('.parent-checkbox').forEach(cb => {
+                const activityId = cb.dataset.activityId;
+                const activity = sampleActivities.find(a => a.id === activityId);
+                const childAssessmentIds = activity.valutazioniSpecialistiche.map(v => v.id);
+                const selectedChildrenCount = childAssessmentIds.filter(id => selectedAssessmentIds.includes(id)).length;
+
+                if (selectedChildrenCount === 0) {
+                    cb.checked = false;
+                    cb.indeterminate = false;
+                } else if (selectedChildrenCount === childAssessmentIds.length) {
+                    cb.checked = true;
+                    cb.indeterminate = false;
+                } else {
+                    cb.checked = false;
+                    cb.indeterminate = true;
+                }
+                
+                cb.addEventListener('change', (e) => handleParentSelection(e.target.dataset.activityId));
+            });
+        }
+
+        // --- GESTORI DI EVENTI ---
+
+        function handleActivitySelection(id) {
+            const index = selectedActivityIds.indexOf(id);
+            if (index > -1) {
+                selectedActivityIds.splice(index, 1);
+            } else {
+                selectedActivityIds.push(id);
+            }
+            renderSelectionList();
+            continueButton.disabled = selectedActivityIds.length === 0;
+        }
+
+        function handleAssessmentSelection(assessmentId) {
+            const index = selectedAssessmentIds.indexOf(assessmentId);
+            if (index > -1) {
+                selectedAssessmentIds.splice(index, 1);
+            } else {
+                selectedAssessmentIds.push(assessmentId);
+            }
+            renderOverview(); 
+        }
+
+        function handleParentSelection(activityId) {
+            const activity = sampleActivities.find(a => a.id === activityId);
+            const childAssessmentIds = activity.valutazioniSpecialistiche.map(v => v.id);
+            const allSelected = childAssessmentIds.every(id => selectedAssessmentIds.includes(id));
+
+            if (allSelected) {
+                selectedAssessmentIds = selectedAssessmentIds.filter(id => !childAssessmentIds.includes(id));
+            } else {
+                childAssessmentIds.forEach(id => {
+                    if (!selectedAssessmentIds.includes(id)) {
+                        selectedAssessmentIds.push(id);
+                    }
+                });
+            }
+            renderOverview();
+        }
+
+        function goToStep2() {
+            step1View.classList.add('hidden');
+            step2View.classList.remove('hidden');
+            subtitle.textContent = "Controlla l'anteprima e seleziona le valutazioni da allegare.";
+            stepIndicator2.classList.remove('bg-gray-300');
+            stepIndicator2.classList.add('bg-[#8c2c4e]');
+            stepLine.classList.add('bg-[#8c2c4e]');
+            renderOverview();
+        }
+
+        function goToStep1() {
+            step2View.classList.add('hidden');
+            step1View.classList.remove('hidden');
+            subtitle.textContent = "Seleziona le attività da includere nella restituzione.";
+            stepIndicator2.classList.add('bg-gray-300');
+            stepIndicator2.classList.remove('bg-[#8c2c4e]');
+            stepLine.classList.remove('bg-[#8c2c4e]');
+        }
+        
+        // --- INIZIALIZZAZIONE ---
+        
+        continueButton.addEventListener('click', goToStep2);
+        backButton.addEventListener('click', goToStep1);
+
+        document.addEventListener('DOMContentLoaded', renderSelectionList);
+
+    </script>
+</body>
+</html>
