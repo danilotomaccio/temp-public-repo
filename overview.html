@@ -469,11 +469,8 @@
             .join("")}</ul></div>`;
         }
 
-        return `<div class="bg-gray-100 border border-gray-200 rounded-md p-4 mt-4 relative"><div class="absolute top-3 right-3"><input type="checkbox" data-assessment-id="${
-          assessment.id
-        }" class="assessment-checkbox h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-400 rounded" ${
-          isChecked ? "checked" : ""
-        }></div><p class="text-xs text-gray-500 mb-2">${
+        return `<div class="bg-gray-100 border border-gray-200 rounded-md p-4 mt-4 relative"><div class="absolute top-3 right-3">
+            </div><p class="text-xs text-gray-500 mb-2">${
           assessment.codice
         } - ${formattedDate}</p><p class="text-gray-800 pr-8">${
           assessment.note
@@ -500,7 +497,7 @@
             .join("")}</div>`;
         }
 
-        return `<div class="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm relative">/* ${parentCheckboxHTML} */<h3 class="text-xl font-bold text-gray-800 mb-1">${
+        return `<div class="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm relative"><h3 class="text-xl font-bold text-gray-800 mb-1">${
           activity.type
         }</h3><p class="text-sm text-gray-500 mb-4">${
           activity.codice
