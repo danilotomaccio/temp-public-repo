@@ -1,27 +1,50 @@
-import React, { useState, useMemo, type FC } from "react";
+import React, { useState, useMemo, FC } from "react";
 
 // --- ICONE SVG ---
 const SortAscendingIcon: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    height="24px"
-    viewBox="0 -960 960 960"
-    width="24px"
-    fill="#5f6368"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
   >
-    <path d="M340-160q-125 0-212.5-87.5T40-460q0-125 87.5-212.5T340-760q52 0 98 16.5t84 45.5l42-42 56 56-42 42q29 38 45.5 84.5T640-460q0 125-87.5 212.5T340-160Zm440 0L640-300l56-56 44 44v-488h80v487l43-43 57 56-140 140ZM240-800v-80h200v80H240Zm100 560q92 0 156-64t64-156q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 92 64 156t156 64Zm-40-180h80v-200h-80v200Zm40-40Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 4h13M3 8h9M3 12h9m-9 4h9m5-4v10l4-3m-4 3l-4-3"
+    />
   </svg>
 );
 
 const SortDescendingIcon: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    height="24px"
-    viewBox="0 -960 960 960"
-    width="24px"
-    fill="#5f6368"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
   >
-    <path d="M713-600 600-713l56-57 57 57 141-142 57 57-198 198ZM200-120v-640q0-33 23.5-56.5T280-840h240v80H280v518l200-86 200 86v-278h80v400L480-240 200-120Zm80-640h240-240Z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 20h13M3 16h9M3 12h9m-9-4h9m5 4V4l4 3m-4-3l-4 3"
+    />
+  </svg>
+);
+
+const ChevronDownIcon: FC<{ className?: string }> = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={`h-6 w-6 ${className}`}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
   </svg>
 );
 
@@ -52,6 +75,7 @@ interface LastClickedSlot {
 }
 
 type SortByType = "chronological" | "best";
+type TimeFilterType = "all" | "morning" | "afternoon";
 
 // --- DATI FITTIZI (MOCK DATA) ---
 
@@ -137,16 +161,36 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, checked, onChange }) => (
   </label>
 );
 
+interface CheckboxProps {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+const Checkbox: FC<CheckboxProps> = ({ label, checked, onChange }) => (
+  <label className="flex items-center cursor-pointer text-sm text-gray-600">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+    />
+    <span className="ml-2">{label}</span>
+  </label>
+);
+
 interface CalendarioMensileProps {
   slots: SlotProcessato[];
   onDayClick: (day: string) => void;
   selectedDays: string[];
+  bookedDates: Set<string>;
 }
 
 const CalendarioMensile: FC<CalendarioMensileProps> = ({
   slots,
   onDayClick,
   selectedDays,
+  bookedDates,
 }) => {
   const oggi = new Date(2025, 8, 1);
   const primoGiornoDelMese = oggi.getDay() === 0 ? 6 : oggi.getDay() - 1;
@@ -168,9 +212,14 @@ const CalendarioMensile: FC<CalendarioMensileProps> = ({
   const getDayClass = (giorno: number) => {
     const dataKey = `2025-09-${String(giorno).padStart(2, "0")}`;
     const stato = giorniPerStato[dataKey];
+    const isBooked = bookedDates.has(dataKey);
 
     let baseClass =
       "w-11 h-11 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200";
+
+    if (isBooked) {
+      return `${baseClass} bg-rose-800 text-white font-bold hover:bg-rose-900`;
+    }
 
     if (!stato)
       return `${baseClass} bg-gray-100 text-gray-400 cursor-not-allowed`;
@@ -272,6 +321,13 @@ const App: FC = () => {
   const [lastClickedSlot, setLastClickedSlot] =
     useState<LastClickedSlot | null>(null);
   const [sortBy, setSortBy] = useState<SortByType>("chronological");
+  const [timeFilter, setTimeFilter] = useState<TimeFilterType>("all");
+  const [showUnavailableSlots, setShowUnavailableSlots] =
+    useState<boolean>(true);
+  const [selectedAppointments, setSelectedAppointments] = useState<
+    SlotProcessato[]
+  >([]);
+  const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
 
   const handleAvailabilityChange = (
     giorno: string,
@@ -346,6 +402,46 @@ const App: FC = () => {
       }
     });
   };
+
+  const handleAppointmentSelect = (clickedSlot: SlotProcessato) => {
+    setSelectedAppointments((prev) => {
+      const isSelected = prev.some(
+        (s) =>
+          s.data === clickedSlot.data &&
+          s.ora === clickedSlot.ora &&
+          s.terapistaId === clickedSlot.terapistaId
+      );
+      if (isSelected) {
+        return prev.filter(
+          (s) =>
+            !(
+              s.data === clickedSlot.data &&
+              s.ora === clickedSlot.ora &&
+              s.terapistaId === clickedSlot.terapistaId
+            )
+        );
+      } else {
+        return [...prev, clickedSlot];
+      }
+    });
+  };
+
+  const toggleDayCollapse = (date: string) => {
+    setCollapsedDays((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(date)) {
+        newSet.delete(date);
+      } else {
+        newSet.add(date);
+      }
+      return newSet;
+    });
+  };
+
+  const bookedDates = useMemo(
+    () => new Set(selectedAppointments.map((app) => app.data)),
+    [selectedAppointments]
+  );
 
   const processedData = useMemo(() => {
     const dayMap = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
@@ -442,30 +538,51 @@ const App: FC = () => {
     return { slots: finalSlots, warningMessage };
   }, [patientAvailability, filters, selectedTherapistId]);
 
-  const slotsForSelectedDays = useMemo(() => {
-    if (selectedDays.length === 0) return [];
+  const groupedAndSortedSlots = useMemo(() => {
+    if (selectedDays.length === 0) return {};
 
-    const filtered = processedData.slots.filter((slot) =>
+    let filtered = processedData.slots.filter((slot) =>
       selectedDays.includes(slot.data)
     );
 
-    if (sortBy === "best") {
-      const statusOrder = { green: 0, blue: 1, grey: 2 };
-      filtered.sort((a, b) => {
-        if (statusOrder[a.status] !== statusOrder[b.status]) {
-          return statusOrder[a.status] - statusOrder[b.status];
-        }
-        return a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora);
-      });
-    } else {
-      // chronological
-      filtered.sort(
-        (a, b) => a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora)
+    if (!showUnavailableSlots) {
+      filtered = filtered.filter((slot) => slot.status !== "grey");
+    }
+
+    if (timeFilter !== "all") {
+      const isMorning = (ora: string) => parseInt(ora.split(":")[0]) < 13;
+      filtered = filtered.filter((slot) =>
+        timeFilter === "morning" ? isMorning(slot.ora) : !isMorning(slot.ora)
       );
     }
 
-    return filtered;
-  }, [selectedDays, processedData.slots, sortBy]);
+    const grouped = filtered.reduce((acc, slot) => {
+      (acc[slot.data] = acc[slot.data] || []).push(slot);
+      return acc;
+    }, {} as Record<string, SlotProcessato[]>);
+
+    for (const date in grouped) {
+      if (sortBy === "best") {
+        const statusOrder = { green: 0, blue: 1, grey: 2 };
+        grouped[date].sort((a, b) => {
+          if (statusOrder[a.status] !== statusOrder[b.status]) {
+            return statusOrder[a.status] - statusOrder[b.status];
+          }
+          return a.ora.localeCompare(b.ora);
+        });
+      } else {
+        grouped[date].sort((a, b) => a.ora.localeCompare(b.ora));
+      }
+    }
+
+    return grouped;
+  }, [
+    selectedDays,
+    processedData.slots,
+    sortBy,
+    timeFilter,
+    showUnavailableSlots,
+  ]);
 
   // --- RENDER ---
 
@@ -722,6 +839,10 @@ const App: FC = () => {
               </h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-rose-800 mr-2 border border-rose-900"></span>
+                  Appuntamento Selezionato
+                </li>
+                <li className="flex items-center">
                   <span className="w-4 h-4 rounded-full bg-rose-500 mr-2 border border-rose-600"></span>
                   Disponibile e filtrato
                 </li>
@@ -746,77 +867,150 @@ const App: FC = () => {
             slots={processedData.slots}
             onDayClick={handleDayClick}
             selectedDays={selectedDays}
+            bookedDates={bookedDates}
           />
         </div>
 
         <div className="lg:col-span-4 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-700">
-              Livello 2: Orari disponibili
-            </h2>
-            <button
-              onClick={() =>
-                setSortBy((prev) =>
-                  prev === "chronological" ? "best" : "chronological"
-                )
-              }
-              className="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
-              title={
-                sortBy === "chronological"
-                  ? "Ordina per soluzioni migliori"
-                  : "Ordina cronologicamente"
-              }
-            >
-              {sortBy === "chronological" ? (
-                <SortAscendingIcon />
-              ) : (
-                <SortDescendingIcon />
-              )}
-            </button>
-          </div>
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Livello 2: Orari disponibili
+          </h2>
           <div
             className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex-grow overflow-y-auto"
             style={{ maxHeight: "600px" }}
           >
-            {slotsForSelectedDays.length > 0 ? (
-              <ul className="space-y-2">
-                {slotsForSelectedDays.map((slot, index) => {
-                  const statusColor = {
-                    green: "border-rose-500 bg-white",
-                    blue: "border-rose-200 bg-white",
-                    grey: "border-gray-300 bg-gray-50",
-                  }[slot.status];
-
+            <div className="flex flex-col gap-3 mb-4 pb-2 border-b border-gray-200 sticky top-0 bg-gray-50 z-10 p-2 -m-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setTimeFilter("all")}
+                    className={`text-xs font-semibold py-1 px-3 rounded-full ${
+                      timeFilter === "all"
+                        ? "bg-rose-600 text-white"
+                        : "bg-white text-gray-600 border"
+                    }`}
+                  >
+                    Tutti
+                  </button>
+                  <button
+                    onClick={() => setTimeFilter("morning")}
+                    className={`text-xs font-semibold py-1 px-3 rounded-full ${
+                      timeFilter === "morning"
+                        ? "bg-rose-600 text-white"
+                        : "bg-white text-gray-600 border"
+                    }`}
+                  >
+                    Mattina
+                  </button>
+                  <button
+                    onClick={() => setTimeFilter("afternoon")}
+                    className={`text-xs font-semibold py-1 px-3 rounded-full ${
+                      timeFilter === "afternoon"
+                        ? "bg-rose-600 text-white"
+                        : "bg-white text-gray-600 border"
+                    }`}
+                  >
+                    Pomeriggio
+                  </button>
+                </div>
+                <button
+                  onClick={() =>
+                    setSortBy((prev) =>
+                      prev === "chronological" ? "best" : "chronological"
+                    )
+                  }
+                  className="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
+                  title={
+                    sortBy === "chronological"
+                      ? "Ordina per soluzioni migliori"
+                      : "Ordina cronologicamente"
+                  }
+                >
+                  {sortBy === "chronological" ? (
+                    <SortAscendingIcon />
+                  ) : (
+                    <SortDescendingIcon />
+                  )}
+                </button>
+              </div>
+              <Checkbox
+                label="Mostra non disponibili"
+                checked={showUnavailableSlots}
+                onChange={() => setShowUnavailableSlots((prev) => !prev)}
+              />
+            </div>
+            {Object.keys(groupedAndSortedSlots).length > 0 ? (
+              <div className="space-y-4">
+                {Object.entries(groupedAndSortedSlots).map(([date, slots]) => {
+                  const isCollapsed = collapsedDays.has(date);
                   return (
-                    <li
-                      key={index}
-                      className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm ${statusColor}`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-                        <span className="font-bold text-gray-800">
-                          {slot.data}
-                        </span>
-                        <span className="font-mono text-gray-600">
-                          {slot.ora}
-                        </span>
+                    <div key={date}>
+                      <div
+                        onClick={() => toggleDayCollapse(date)}
+                        className="flex justify-between items-center text-md font-bold text-gray-800 mb-2 sticky top-20 bg-gray-50 py-2 px-2 -mx-2 cursor-pointer rounded hover:bg-gray-100"
+                      >
+                        <h3>
+                          {new Date(date).toLocaleDateString("it-IT", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                          })}
+                        </h3>
+                        <ChevronDownIcon
+                          className={`transition-transform transform ${
+                            isCollapsed ? "" : "rotate-180"
+                          }`}
+                        />
                       </div>
-                      <div className="text-right">
-                        <span className="text-sm text-gray-700">
-                          {slot.terapista.nome}
-                        </span>
-                        <span className="text-xs text-gray-500 block">
-                          Carico: {slot.terapista.caricoLavoro}%
-                        </span>
-                      </div>
-                    </li>
+                      {!isCollapsed && (
+                        <ul className="space-y-2">
+                          {slots.map((slot, index) => {
+                            const isSelected = selectedAppointments.some(
+                              (s) =>
+                                s.data === slot.data &&
+                                s.ora === slot.ora &&
+                                s.terapistaId === slot.terapistaId
+                            );
+                            const statusColor = {
+                              green: "border-rose-500 bg-white",
+                              blue: "border-rose-200 bg-white",
+                              grey: "border-gray-300 bg-gray-50 text-gray-500",
+                            }[slot.status];
+
+                            return (
+                              <li
+                                key={index}
+                                onClick={() => handleAppointmentSelect(slot)}
+                                className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm cursor-pointer transition-all ${statusColor} ${
+                                  isSelected
+                                    ? "ring-2 ring-offset-2 ring-rose-600"
+                                    : ""
+                                }`}
+                              >
+                                <div className="flex items-center space-x-4">
+                                  <span className="font-mono">{slot.ora}</span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-sm">
+                                    {slot.terapista.nome}
+                                  </span>
+                                  <span className="text-xs block">
+                                    Carico: {slot.terapista.caricoLavoro}%
+                                  </span>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
                   );
                 })}
-              </ul>
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full">
                 <p className="text-center text-gray-500 p-8">
-                  Seleziona uno o più giorni dal calendario per vedere gli orari
-                  disponibili.
+                  Nessuno slot disponibile per i giorni e i filtri selezionati.
                 </p>
               </div>
             )}
@@ -834,7 +1028,7 @@ const App: FC = () => {
         <button
           onClick={() => alert("Prenotazione confermata! (Simulazione)")}
           className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          disabled={selectedDays.length === 0}
+          disabled={selectedAppointments.length === 0}
         >
           Conferma Prenotazione
         </button>
