@@ -1,4 +1,4 @@
-import React, { useState, useMemo, FC } from "react";
+import React, { useState, useMemo, type FC } from "react";
 
 // --- ICONE SVG ---
 const SortAscendingIcon: FC = () => (
