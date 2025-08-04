@@ -1,8 +1,32 @@
-import React, { useState, useMemo } from "react";
-import "./inde.css";
+import React, { useState, useMemo, type FC } from "react";
+
+// --- DEFINIZIONE DEI TIPI (TYPESCRIPT) ---
+
+interface Terapista {
+  id: number;
+  nome: string;
+  caricoLavoro: number;
+}
+
+interface SlotBase {
+  data: string;
+  ora: string;
+  terapistaId: number;
+}
+
+interface SlotProcessato extends SlotBase {
+  terapista: Terapista;
+  status: "grey" | "blue" | "green";
+}
+
+type PatientAvailability = Record<string, Record<string, boolean>>;
+
+interface LastClickedSlot {
+  giorno: string;
+  ora: string;
+}
 
 // --- DATI FITTIZI (MOCK DATA) ---
-// Simula i dati che arriverebbero da un database o un'API
 
 const CICLO_ESISTENTE = {
   nome: "Ciclo di Fisioterapia Post-operatoria",
@@ -12,16 +36,15 @@ const CICLO_ESISTENTE = {
   dataFineDefault: "2025-10-15",
 };
 
-const TERAPISTI = [
+const TERAPISTI: Terapista[] = [
   { id: 1, nome: "Mario Rossi", caricoLavoro: 85 },
   { id: 2, nome: "Luisa Bianchi", caricoLavoro: 60 },
   { id: 3, nome: "Giovanni Verdi", caricoLavoro: 95 },
   { id: 4, nome: "Anna Neri", caricoLavoro: 55 },
 ];
 
-// Genera slot di disponibilità per i terapisti in modo casuale per il mese di Settembre 2025
-const generatoreSlotDisponibili = () => {
-  const slots = [];
+const generatoreSlotDisponibili = (): SlotBase[] => {
+  const slots: SlotBase[] = [];
   const giorniSettimana = [1, 2, 3, 4, 5]; // Lun-Ven
   const orari = [
     "09:00",
@@ -40,7 +63,6 @@ const generatoreSlotDisponibili = () => {
 
     TERAPISTI.forEach((terapista) => {
       orari.forEach((ora) => {
-        // Simula una disponibilità casuale
         if (Math.random() > 0.6) {
           slots.push({
             data: `2025-09-${String(giorno).padStart(2, "0")}`,
@@ -54,11 +76,17 @@ const generatoreSlotDisponibili = () => {
   return slots;
 };
 
-const SLOT_DISPONIBILI_TERAPISTI = generatoreSlotDisponibili();
+const SLOT_DISPONIBILI_TERAPISTI: SlotBase[] = generatoreSlotDisponibili();
 
 // --- COMPONENTI UTILITY ---
 
-const ToggleSwitch = ({ label, checked, onChange }) => (
+interface ToggleSwitchProps {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, checked, onChange }) => (
   <label className="flex items-center cursor-pointer">
     <div className="relative">
       <input
@@ -82,13 +110,23 @@ const ToggleSwitch = ({ label, checked, onChange }) => (
   </label>
 );
 
-const CalendarioMensile = ({ slots, onDayClick, selectedDays }) => {
-  const oggi = new Date(2025, 8, 1); // Inizia da Settembre 2025
-  const primoGiornoDelMese = oggi.getDay() === 0 ? 6 : oggi.getDay() - 1; // 0=Lun, 6=Dom
+interface CalendarioMensileProps {
+  slots: SlotProcessato[];
+  onDayClick: (day: string) => void;
+  selectedDays: string[];
+}
+
+const CalendarioMensile: FC<CalendarioMensileProps> = ({
+  slots,
+  onDayClick,
+  selectedDays,
+}) => {
+  const oggi = new Date(2025, 8, 1);
+  const primoGiornoDelMese = oggi.getDay() === 0 ? 6 : oggi.getDay() - 1;
   const giorniNelMese = new Date(2025, 9, 0).getDate();
 
   const giorniPerStato = useMemo(() => {
-    const stati = {};
+    const stati: Record<string, { hasBlue: boolean; hasGreen: boolean }> = {};
     slots.forEach((slot) => {
       if (!stati[slot.data]) {
         stati[slot.data] = { hasBlue: false, hasGreen: false };
@@ -100,7 +138,7 @@ const CalendarioMensile = ({ slots, onDayClick, selectedDays }) => {
     return stati;
   }, [slots]);
 
-  const getDayClass = (giorno) => {
+  const getDayClass = (giorno: number) => {
     const dataKey = `2025-09-${String(giorno).padStart(2, "0")}`;
     const stato = giorniPerStato[dataKey];
 
@@ -110,7 +148,6 @@ const CalendarioMensile = ({ slots, onDayClick, selectedDays }) => {
     if (!stato)
       return `${baseClass} bg-gray-100 text-gray-400 cursor-not-allowed`;
 
-    // Applichiamo la nuova logica colori
     if (stato.hasGreen)
       baseClass += " bg-rose-500 hover:bg-rose-600 text-white";
     else if (stato.hasBlue)
@@ -159,10 +196,14 @@ const CalendarioMensile = ({ slots, onDayClick, selectedDays }) => {
 
 // --- COMPONENTE PRINCIPALE ---
 
-function App() {
-  const [step, setStep] = useState(1);
-  const [startDate, setStartDate] = useState(CICLO_ESISTENTE.dataInizioDefault);
-  const [endDate, setEndDate] = useState(CICLO_ESISTENTE.dataFineDefault);
+const App: FC = () => {
+  const [step, setStep] = useState<number>(1);
+  const [startDate, setStartDate] = useState<string>(
+    CICLO_ESISTENTE.dataInizioDefault
+  );
+  const [endDate, setEndDate] = useState<string>(
+    CICLO_ESISTENTE.dataFineDefault
+  );
 
   const giorniSettimana = ["LUN", "MAR", "MER", "GIO", "VEN"];
   const fasceOrarie = [
@@ -176,16 +217,17 @@ function App() {
     "17:00",
   ];
 
-  const [patientAvailability, setPatientAvailability] = useState(() => {
-    const availability = {};
-    giorniSettimana.forEach((giorno) => {
-      availability[giorno] = {};
-      fasceOrarie.forEach((ora) => {
-        availability[giorno][ora] = false;
+  const [patientAvailability, setPatientAvailability] =
+    useState<PatientAvailability>(() => {
+      const availability: PatientAvailability = {};
+      giorniSettimana.forEach((giorno) => {
+        availability[giorno] = {};
+        fasceOrarie.forEach((ora) => {
+          availability[giorno][ora] = false;
+        });
       });
+      return availability;
     });
-    return availability;
-  });
 
   const [filters, setFilters] = useState({
     preferenzaTerapistaUnico: false,
@@ -193,49 +235,104 @@ function App() {
     terapistiPiuScarichi: false,
   });
 
-  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [lastClickedSlot, setLastClickedSlot] =
+    useState<LastClickedSlot | null>(null);
 
-  const handleAvailabilityChange = (giorno, ora) => {
-    setPatientAvailability((prev) => ({
-      ...prev,
-      [giorno]: {
-        ...prev[giorno],
-        [ora]: !prev[giorno][ora],
-      },
-    }));
+  const handleAvailabilityChange = (
+    giorno: string,
+    ora: string,
+    event: React.MouseEvent
+  ) => {
+    const isShiftPressed = event.nativeEvent.shiftKey;
+    const newAvailability = JSON.parse(JSON.stringify(patientAvailability));
+
+    if (isShiftPressed && lastClickedSlot) {
+      // Logica per la selezione a intervallo (SHIFT + Click)
+      const allSlots = giorniSettimana.flatMap((g) =>
+        fasceOrarie.map((o) => ({ giorno: g, ora: o }))
+      );
+      const startIndex = allSlots.findIndex(
+        (slot) =>
+          slot.giorno === lastClickedSlot.giorno &&
+          slot.ora === lastClickedSlot.ora
+      );
+      const endIndex = allSlots.findIndex(
+        (slot) => slot.giorno === giorno && slot.ora === ora
+      );
+
+      if (startIndex !== -1 && endIndex !== -1) {
+        const rangeStart = Math.min(startIndex, endIndex);
+        const rangeEnd = Math.max(startIndex, endIndex);
+
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+          const slotToUpdate = allSlots[i];
+          newAvailability[slotToUpdate.giorno][slotToUpdate.ora] = true; // Seleziona sempre nell'intervallo
+        }
+        setPatientAvailability(newAvailability);
+      }
+    } else {
+      // Logica per il click singolo
+      newAvailability[giorno][ora] = !newAvailability[giorno][ora];
+      setPatientAvailability(newAvailability);
+    }
+
+    // Aggiorna l'ultimo slot cliccato per la prossima selezione con SHIFT
+    setLastClickedSlot({ giorno, ora });
   };
 
-  const handleFilterChange = (filterName) => {
+  const handleBulkAvailabilityChange = (
+    type: "mattina" | "pomeriggio" | "giorno" | "nessuno"
+  ) => {
+    const newAvailability: PatientAvailability = JSON.parse(
+      JSON.stringify(patientAvailability)
+    );
+    const isMorning = (ora: string) => parseInt(ora.split(":")[0]) < 13;
+
+    giorniSettimana.forEach((giorno) => {
+      fasceOrarie.forEach((ora) => {
+        let shouldBeSelected = false;
+        if (type === "mattina" && isMorning(ora)) shouldBeSelected = true;
+        if (type === "pomeriggio" && !isMorning(ora)) shouldBeSelected = true;
+        if (type === "giorno") shouldBeSelected = true;
+        // 'nessuno' lascia shouldBeSelected a false
+        newAvailability[giorno][ora] = shouldBeSelected;
+      });
+    });
+    setPatientAvailability(newAvailability);
+  };
+
+  const handleFilterChange = (filterName: keyof typeof filters) => {
     setFilters((prev) => ({ ...prev, [filterName]: !prev[filterName] }));
   };
 
-  const handleDayClick = (day) => {
+  const handleDayClick = (day: string) => {
     setSelectedDays((prev) => {
       const isSelected = prev.includes(day);
       if (isSelected) {
         return prev.filter((d) => d !== day);
       } else {
-        return [...prev, day].sort(); // Mantieni i giorni ordinati
+        return [...prev, day].sort();
       }
     });
   };
 
-  // Logica di elaborazione degli slot (il cuore dell'applicazione)
   const processedData = useMemo(() => {
     const dayMap = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
 
-    const patientMatchingSlots = SLOT_DISPONIBILI_TERAPISTI.map((slot) => {
-      const slotDate = new Date(slot.data);
-      const dayOfWeek = dayMap[slotDate.getDay()];
-      const isPatientAvailable =
-        patientAvailability[dayOfWeek]?.[slot.ora] || false;
+    const patientMatchingSlots: SlotProcessato[] =
+      SLOT_DISPONIBILI_TERAPISTI.map((slot) => {
+        const slotDate = new Date(slot.data);
+        const dayOfWeek = dayMap[slotDate.getDay()];
+        const isPatientAvailable =
+          patientAvailability[dayOfWeek]?.[slot.ora] || false;
 
-      return {
-        ...slot,
-        terapista: TERAPISTI.find((t) => t.id === slot.terapistaId),
-        status: isPatientAvailable ? "blue" : "grey",
-      };
-    });
+        return {
+          ...slot,
+          terapista: TERAPISTI.find((t) => t.id === slot.terapistaId)!,
+          status: isPatientAvailable ? "blue" : "grey",
+        };
+      });
 
     let finalSlots = patientMatchingSlots;
 
@@ -256,13 +353,16 @@ function App() {
         const therapistCounts = filteredByWorkload.reduce((acc, slot) => {
           acc[slot.terapistaId] = (acc[slot.terapistaId] || 0) + 1;
           return acc;
-        }, {});
+        }, {} as Record<number, number>);
 
         const bestTherapistId = Object.keys(therapistCounts).reduce((a, b) =>
-          therapistCounts[a] > therapistCounts[b] ? a : b
+          therapistCounts[Number(a)] > therapistCounts[Number(b)] ? a : b
         );
 
-        if (therapistCounts[bestTherapistId] >= CICLO_ESISTENTE.seduteTotali) {
+        if (
+          therapistCounts[Number(bestTherapistId)] >=
+          CICLO_ESISTENTE.seduteTotali
+        ) {
           filteredByUniqueTherapist = filteredByWorkload.filter(
             (s) => String(s.terapistaId) === bestTherapistId
           );
@@ -290,14 +390,15 @@ function App() {
     if (filters.avviaPrimaPossibile) {
       finalSlots.sort(
         (a, b) =>
-          new Date(a.data) - new Date(b.data) || a.ora.localeCompare(b.ora)
+          new Date(a.data).getTime() - new Date(b.data).getTime() ||
+          a.ora.localeCompare(b.ora)
       );
     }
 
     const availableGreenSlotsCount = finalSlots.filter(
       (s) => s.status === "green"
     ).length;
-    let warningMessage = null;
+    let warningMessage: string | null = null;
     if (availableGreenSlotsCount < CICLO_ESISTENTE.seduteTotali) {
       warningMessage = `Attenzione: Sono stati trovati solo ${availableGreenSlotsCount} slot che soddisfano tutti i filtri, ma ne servono ${CICLO_ESISTENTE.seduteTotali}. Prova a disattivare qualche filtro o esplora le opzioni colorate per trovare più disponibilità.`;
     }
@@ -389,9 +490,37 @@ function App() {
         </div>
 
         <div className="lg:col-span-2 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-200 pb-2">
-            Disponibilità del Paziente
-          </h2>
+          <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+            <h2 className="text-lg font-semibold text-gray-700">
+              Disponibilità del Paziente
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => handleBulkAvailabilityChange("mattina")}
+                className="text-xs bg-rose-100 text-rose-700 font-semibold py-1 px-3 rounded-full hover:bg-rose-200"
+              >
+                Mattina
+              </button>
+              <button
+                onClick={() => handleBulkAvailabilityChange("pomeriggio")}
+                className="text-xs bg-rose-100 text-rose-700 font-semibold py-1 px-3 rounded-full hover:bg-rose-200"
+              >
+                Pomeriggio
+              </button>
+              <button
+                onClick={() => handleBulkAvailabilityChange("giorno")}
+                className="text-xs bg-rose-100 text-rose-700 font-semibold py-1 px-3 rounded-full hover:bg-rose-200"
+              >
+                Tutto il giorno
+              </button>
+              <button
+                onClick={() => handleBulkAvailabilityChange("nessuno")}
+                className="text-xs bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-full hover:bg-gray-300"
+              >
+                Deseleziona tutto
+              </button>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -417,8 +546,11 @@ function App() {
                       <td key={`${giorno}-${ora}`} className="p-2 text-center">
                         <input
                           type="checkbox"
-                          checked={patientAvailability[giorno][ora]}
-                          onChange={() => handleAvailabilityChange(giorno, ora)}
+                          checked={patientAvailability[giorno]?.[ora] || false}
+                          onClick={(e) =>
+                            handleAvailabilityChange(giorno, ora, e)
+                          }
+                          onChange={() => {}} // Dummy onChange per evitare warning di React
                           className="w-5 h-5 rounded text-rose-600 focus:ring-rose-500 cursor-pointer border-gray-300"
                         />
                       </td>
@@ -590,6 +722,6 @@ function App() {
       {step === 1 ? renderStep1() : renderStep2()}
     </div>
   );
-}
+};
 
 export default App;
