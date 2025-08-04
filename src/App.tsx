@@ -4,34 +4,24 @@ import React, { useState, useMemo, type FC } from "react";
 const SortAscendingIcon: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
+    height="24px"
+    viewBox="0 -960 960 960"
+    width="24px"
+    fill="#5f6368"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 4h13M3 8h9M3 12h9m-9 4h9m5-4v10l4-3m-4 3l-4-3"
-    />
+    <path d="M340-160q-125 0-212.5-87.5T40-460q0-125 87.5-212.5T340-760q52 0 98 16.5t84 45.5l42-42 56 56-42 42q29 38 45.5 84.5T640-460q0 125-87.5 212.5T340-160Zm440 0L640-300l56-56 44 44v-488h80v487l43-43 57 56-140 140ZM240-800v-80h200v80H240Zm100 560q92 0 156-64t64-156q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 92 64 156t156 64Zm-40-180h80v-200h-80v200Zm40-40Z" />
   </svg>
 );
 
 const SortDescendingIcon: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
+    height="24px"
+    viewBox="0 -960 960 960"
+    width="24px"
+    fill="#5f6368"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 20h13M3 16h9M3 12h9m-9-4h9m5 4V4l4 3m-4-3l-4 3"
-    />
+    <path d="M713-600 600-713l56-57 57 57 141-142 57 57-198 198ZM200-120v-640q0-33 23.5-56.5T280-840h240v80H280v518l200-86 200 86v-278h80v400L480-240 200-120Zm80-640h240-240Z" />
   </svg>
 );
 
