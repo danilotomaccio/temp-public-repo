@@ -1,5 +1,40 @@
 import React, { useState, useMemo, type FC } from "react";
 
+// --- ICONE SVG ---
+const SortAscendingIcon: FC = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 4h13M3 8h9M3 12h9m-9 4h9m5-4v10l4-3m-4 3l-4-3"
+    />
+  </svg>
+);
+
+const SortDescendingIcon: FC = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 20h13M3 16h9M3 12h9m-9-4h9m5 4V4l4 3m-4-3l-4 3"
+    />
+  </svg>
+);
+
 // --- DEFINIZIONE DEI TIPI (TYPESCRIPT) ---
 
 interface Terapista {
@@ -25,6 +60,8 @@ interface LastClickedSlot {
   giorno: string;
   ora: string;
 }
+
+type SortByType = "chronological" | "best";
 
 // --- DATI FITTIZI (MOCK DATA) ---
 
@@ -162,7 +199,7 @@ const CalendarioMensile: FC<CalendarioMensileProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200">
+    <div className="bg-white p-4 rounded-lg border border-gray-200 h-full">
       <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-500 mb-2">
         <div>LUN</div>
         <div>MAR</div>
@@ -204,6 +241,9 @@ const App: FC = () => {
   const [endDate, setEndDate] = useState<string>(
     CICLO_ESISTENTE.dataFineDefault
   );
+  const [frequenza, setFrequenza] = useState<string>(
+    CICLO_ESISTENTE.frequenzaDefault
+  );
 
   const giorniSettimana = ["LUN", "MAR", "MER", "GIO", "VEN"];
   const fasceOrarie = [
@@ -235,9 +275,13 @@ const App: FC = () => {
     terapistiPiuScarichi: false,
   });
 
+  const [selectedTherapistId, setSelectedTherapistId] = useState<number | null>(
+    null
+  );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [lastClickedSlot, setLastClickedSlot] =
     useState<LastClickedSlot | null>(null);
+  const [sortBy, setSortBy] = useState<SortByType>("chronological");
 
   const handleAvailabilityChange = (
     giorno: string,
@@ -248,7 +292,6 @@ const App: FC = () => {
     const newAvailability = JSON.parse(JSON.stringify(patientAvailability));
 
     if (isShiftPressed && lastClickedSlot) {
-      // Logica per la selezione a intervallo (SHIFT + Click)
       const allSlots = giorniSettimana.flatMap((g) =>
         fasceOrarie.map((o) => ({ giorno: g, ora: o }))
       );
@@ -267,17 +310,15 @@ const App: FC = () => {
 
         for (let i = rangeStart; i <= rangeEnd; i++) {
           const slotToUpdate = allSlots[i];
-          newAvailability[slotToUpdate.giorno][slotToUpdate.ora] = true; // Seleziona sempre nell'intervallo
+          newAvailability[slotToUpdate.giorno][slotToUpdate.ora] = true;
         }
         setPatientAvailability(newAvailability);
       }
     } else {
-      // Logica per il click singolo
       newAvailability[giorno][ora] = !newAvailability[giorno][ora];
       setPatientAvailability(newAvailability);
     }
 
-    // Aggiorna l'ultimo slot cliccato per la prossima selezione con SHIFT
     setLastClickedSlot({ giorno, ora });
   };
 
@@ -295,7 +336,6 @@ const App: FC = () => {
         if (type === "mattina" && isMorning(ora)) shouldBeSelected = true;
         if (type === "pomeriggio" && !isMorning(ora)) shouldBeSelected = true;
         if (type === "giorno") shouldBeSelected = true;
-        // 'nessuno' lascia shouldBeSelected a false
         newAvailability[giorno][ora] = shouldBeSelected;
       });
     });
@@ -320,19 +360,25 @@ const App: FC = () => {
   const processedData = useMemo(() => {
     const dayMap = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
 
-    const patientMatchingSlots: SlotProcessato[] =
-      SLOT_DISPONIBILI_TERAPISTI.map((slot) => {
-        const slotDate = new Date(slot.data);
-        const dayOfWeek = dayMap[slotDate.getDay()];
-        const isPatientAvailable =
-          patientAvailability[dayOfWeek]?.[slot.ora] || false;
+    const initialSlots =
+      selectedTherapistId === null
+        ? SLOT_DISPONIBILI_TERAPISTI
+        : SLOT_DISPONIBILI_TERAPISTI.filter(
+            (slot) => slot.terapistaId === selectedTherapistId
+          );
 
-        return {
-          ...slot,
-          terapista: TERAPISTI.find((t) => t.id === slot.terapistaId)!,
-          status: isPatientAvailable ? "blue" : "grey",
-        };
-      });
+    const patientMatchingSlots: SlotProcessato[] = initialSlots.map((slot) => {
+      const slotDate = new Date(slot.data);
+      const dayOfWeek = dayMap[slotDate.getDay()];
+      const isPatientAvailable =
+        patientAvailability[dayOfWeek]?.[slot.ora] || false;
+
+      return {
+        ...slot,
+        terapista: TERAPISTI.find((t) => t.id === slot.terapistaId)!,
+        status: isPatientAvailable ? "blue" : "grey",
+      };
+    });
 
     let finalSlots = patientMatchingSlots;
 
@@ -404,16 +450,32 @@ const App: FC = () => {
     }
 
     return { slots: finalSlots, warningMessage };
-  }, [patientAvailability, filters]);
+  }, [patientAvailability, filters, selectedTherapistId]);
 
   const slotsForSelectedDays = useMemo(() => {
     if (selectedDays.length === 0) return [];
-    return processedData.slots
-      .filter((slot) => selectedDays.includes(slot.data))
-      .sort(
+
+    const filtered = processedData.slots.filter((slot) =>
+      selectedDays.includes(slot.data)
+    );
+
+    if (sortBy === "best") {
+      const statusOrder = { green: 0, blue: 1, grey: 2 };
+      filtered.sort((a, b) => {
+        if (statusOrder[a.status] !== statusOrder[b.status]) {
+          return statusOrder[a.status] - statusOrder[b.status];
+        }
+        return a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora);
+      });
+    } else {
+      // chronological
+      filtered.sort(
         (a, b) => a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora)
       );
-  }, [selectedDays, processedData.slots]);
+    }
+
+    return filtered;
+  }, [selectedDays, processedData.slots, sortBy]);
 
   // --- RENDER ---
 
@@ -449,12 +511,19 @@ const App: FC = () => {
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-600">
+              <label
+                htmlFor="frequenza"
+                className="text-sm font-medium text-gray-600"
+              >
                 Frequenza
               </label>
-              <p className="text-md text-gray-900">
-                {CICLO_ESISTENTE.frequenzaDefault}
-              </p>
+              <input
+                type="text"
+                id="frequenza"
+                value={frequenza}
+                onChange={(e) => setFrequenza(e.target.value)}
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+              />
             </div>
             <div>
               <label
@@ -593,26 +662,69 @@ const App: FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-3">
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 h-fit">
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 h-full">
             <h2 className="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-200 pb-2">
               Filtri
             </h2>
-            <div className="space-y-6">
-              <ToggleSwitch
-                label="Terapista unico"
-                checked={filters.preferenzaTerapistaUnico}
-                onChange={() => handleFilterChange("preferenzaTerapistaUnico")}
-              />
-              <ToggleSwitch
-                label="Avvia prima possibile"
-                checked={filters.avviaPrimaPossibile}
-                onChange={() => handleFilterChange("avviaPrimaPossibile")}
-              />
-              <ToggleSwitch
-                label="Terapisti scarichi"
-                checked={filters.terapistiPiuScarichi}
-                onChange={() => handleFilterChange("terapistiPiuScarichi")}
-              />
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Terapista
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedTherapistId(null)}
+                    className={`py-1 px-3 rounded-full text-sm font-semibold transition-colors ${
+                      selectedTherapistId === null
+                        ? "bg-rose-600 text-white"
+                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                    }`}
+                  >
+                    Tutti
+                  </button>
+                  {TERAPISTI.map((terapista) => (
+                    <button
+                      key={terapista.id}
+                      onClick={() => setSelectedTherapistId(terapista.id)}
+                      className={`py-1 px-3 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
+                        selectedTherapistId === terapista.id
+                          ? "bg-rose-600 text-white"
+                          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {terapista.nome}
+                      <span
+                        className={`text-xs px-1.5 py-0.5 rounded-full ${
+                          selectedTherapistId === terapista.id
+                            ? "bg-rose-400 text-white"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {terapista.caricoLavoro}%
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-6 pt-4 border-t border-gray-200">
+                <ToggleSwitch
+                  label="Terapista unico"
+                  checked={filters.preferenzaTerapistaUnico}
+                  onChange={() =>
+                    handleFilterChange("preferenzaTerapistaUnico")
+                  }
+                />
+                <ToggleSwitch
+                  label="Avvia prima possibile"
+                  checked={filters.avviaPrimaPossibile}
+                  onChange={() => handleFilterChange("avviaPrimaPossibile")}
+                />
+                <ToggleSwitch
+                  label="Terapisti scarichi"
+                  checked={filters.terapistiPiuScarichi}
+                  onChange={() => handleFilterChange("terapistiPiuScarichi")}
+                />
+              </div>
             </div>
             <div className="mt-8 border-t border-gray-200 pt-4">
               <h3 className="font-semibold text-gray-700 mb-2">
@@ -636,66 +748,89 @@ const App: FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-9 space-y-8">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">
-              Livello 1: Seleziona i Giorni (Settembre 2025)
+        <div className="lg:col-span-5">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Livello 1: Seleziona i Giorni
+          </h2>
+          <CalendarioMensile
+            slots={processedData.slots}
+            onDayClick={handleDayClick}
+            selectedDays={selectedDays}
+          />
+        </div>
+
+        <div className="lg:col-span-4 flex flex-col">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-700">
+              Livello 2: Orari disponibili
             </h2>
-            <CalendarioMensile
-              slots={processedData.slots}
-              onDayClick={handleDayClick}
-              selectedDays={selectedDays}
-            />
+            <button
+              onClick={() =>
+                setSortBy((prev) =>
+                  prev === "chronological" ? "best" : "chronological"
+                )
+              }
+              className="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
+              title={
+                sortBy === "chronological"
+                  ? "Ordina per soluzioni migliori"
+                  : "Ordina cronologicamente"
+              }
+            >
+              {sortBy === "chronological" ? (
+                <SortAscendingIcon />
+              ) : (
+                <SortDescendingIcon />
+              )}
+            </button>
           </div>
+          <div
+            className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex-grow overflow-y-auto"
+            style={{ maxHeight: "600px" }}
+          >
+            {slotsForSelectedDays.length > 0 ? (
+              <ul className="space-y-2">
+                {slotsForSelectedDays.map((slot, index) => {
+                  const statusColor = {
+                    green: "border-rose-500 bg-white",
+                    blue: "border-rose-200 bg-white",
+                    grey: "border-gray-300 bg-gray-50",
+                  }[slot.status];
 
-          {selectedDays.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">
-                Livello 2: Orari disponibili per i giorni scelti
-              </h2>
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-96 overflow-y-auto">
-                {slotsForSelectedDays.length > 0 ? (
-                  <ul className="space-y-2">
-                    {slotsForSelectedDays.map((slot, index) => {
-                      const statusColor = {
-                        green: "border-rose-500 bg-white",
-                        blue: "border-rose-200 bg-white",
-                        grey: "border-gray-300 bg-gray-50",
-                      }[slot.status];
-
-                      return (
-                        <li
-                          key={index}
-                          className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm ${statusColor}`}
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-                            <span className="font-bold text-gray-800">
-                              {slot.data}
-                            </span>
-                            <span className="font-mono text-gray-600">
-                              {slot.ora}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-sm text-gray-700">
-                              {slot.terapista.nome}
-                            </span>
-                            <span className="text-xs text-gray-500 block">
-                              Carico: {slot.terapista.caricoLavoro}%
-                            </span>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="text-center text-gray-500 p-8">
-                    Nessuno slot disponibile per i giorni selezionati.
-                  </p>
-                )}
+                  return (
+                    <li
+                      key={index}
+                      className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm ${statusColor}`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+                        <span className="font-bold text-gray-800">
+                          {slot.data}
+                        </span>
+                        <span className="font-mono text-gray-600">
+                          {slot.ora}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm text-gray-700">
+                          {slot.terapista.nome}
+                        </span>
+                        <span className="text-xs text-gray-500 block">
+                          Carico: {slot.terapista.caricoLavoro}%
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-center text-gray-500 p-8">
+                  Seleziona uno o più giorni dal calendario per vedere gli orari
+                  disponibili.
+                </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
