@@ -1,0 +1,595 @@
+import React, { useState, useMemo } from "react";
+import "./inde.css";
+
+// --- DATI FITTIZI (MOCK DATA) ---
+// Simula i dati che arriverebbero da un database o un'API
+
+const CICLO_ESISTENTE = {
+  nome: "Ciclo di Fisioterapia Post-operatoria",
+  seduteTotali: 10,
+  frequenzaDefault: "2 volte/settimana",
+  dataInizioDefault: "2025-09-01",
+  dataFineDefault: "2025-10-15",
+};
+
+const TERAPISTI = [
+  { id: 1, nome: "Mario Rossi", caricoLavoro: 85 },
+  { id: 2, nome: "Luisa Bianchi", caricoLavoro: 60 },
+  { id: 3, nome: "Giovanni Verdi", caricoLavoro: 95 },
+  { id: 4, nome: "Anna Neri", caricoLavoro: 55 },
+];
+
+// Genera slot di disponibilità per i terapisti in modo casuale per il mese di Settembre 2025
+const generatoreSlotDisponibili = () => {
+  const slots = [];
+  const giorniSettimana = [1, 2, 3, 4, 5]; // Lun-Ven
+  const orari = [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+  ];
+
+  for (let giorno = 1; giorno <= 30; giorno++) {
+    const data = new Date(2025, 8, giorno); // Settembre 2025
+    if (!giorniSettimana.includes(data.getDay())) continue;
+
+    TERAPISTI.forEach((terapista) => {
+      orari.forEach((ora) => {
+        // Simula una disponibilità casuale
+        if (Math.random() > 0.6) {
+          slots.push({
+            data: `2025-09-${String(giorno).padStart(2, "0")}`,
+            ora,
+            terapistaId: terapista.id,
+          });
+        }
+      });
+    });
+  }
+  return slots;
+};
+
+const SLOT_DISPONIBILI_TERAPISTI = generatoreSlotDisponibili();
+
+// --- COMPONENTI UTILITY ---
+
+const ToggleSwitch = ({ label, checked, onChange }) => (
+  <label className="flex items-center cursor-pointer">
+    <div className="relative">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={checked}
+        onChange={onChange}
+      />
+      <div
+        className={`block w-14 h-8 rounded-full transition-colors ${
+          checked ? "bg-rose-600" : "bg-gray-300"
+        }`}
+      ></div>
+      <div
+        className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${
+          checked ? "transform translate-x-6" : ""
+        }`}
+      ></div>
+    </div>
+    <div className="ml-3 text-gray-700 font-medium">{label}</div>
+  </label>
+);
+
+const CalendarioMensile = ({ slots, onDayClick, selectedDays }) => {
+  const oggi = new Date(2025, 8, 1); // Inizia da Settembre 2025
+  const primoGiornoDelMese = oggi.getDay() === 0 ? 6 : oggi.getDay() - 1; // 0=Lun, 6=Dom
+  const giorniNelMese = new Date(2025, 9, 0).getDate();
+
+  const giorniPerStato = useMemo(() => {
+    const stati = {};
+    slots.forEach((slot) => {
+      if (!stati[slot.data]) {
+        stati[slot.data] = { hasBlue: false, hasGreen: false };
+      }
+      if (slot.status === "blue" || slot.status === "green")
+        stati[slot.data].hasBlue = true;
+      if (slot.status === "green") stati[slot.data].hasGreen = true;
+    });
+    return stati;
+  }, [slots]);
+
+  const getDayClass = (giorno) => {
+    const dataKey = `2025-09-${String(giorno).padStart(2, "0")}`;
+    const stato = giorniPerStato[dataKey];
+
+    let baseClass =
+      "w-11 h-11 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200";
+
+    if (!stato)
+      return `${baseClass} bg-gray-100 text-gray-400 cursor-not-allowed`;
+
+    // Applichiamo la nuova logica colori
+    if (stato.hasGreen)
+      baseClass += " bg-rose-500 hover:bg-rose-600 text-white";
+    else if (stato.hasBlue)
+      baseClass += " bg-rose-200 hover:bg-rose-300 text-rose-800";
+    else baseClass += " bg-gray-200 hover:bg-gray-300 text-gray-600";
+
+    if (selectedDays.includes(dataKey)) {
+      baseClass += " ring-4 ring-offset-2 ring-offset-white ring-rose-500";
+    }
+
+    return baseClass;
+  };
+
+  return (
+    <div className="bg-white p-4 rounded-lg border border-gray-200">
+      <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-500 mb-2">
+        <div>LUN</div>
+        <div>MAR</div>
+        <div>MER</div>
+        <div>GIO</div>
+        <div>VEN</div>
+        <div>SAB</div>
+        <div>DOM</div>
+      </div>
+      <div className="grid grid-cols-7 gap-2">
+        {Array.from({ length: primoGiornoDelMese }).map((_, i) => (
+          <div key={`empty-${i}`}></div>
+        ))}
+        {Array.from({ length: giorniNelMese }).map((_, i) => {
+          const giorno = i + 1;
+          const dataKey = `2025-09-${String(giorno).padStart(2, "0")}`;
+          return (
+            <div
+              key={giorno}
+              className={getDayClass(giorno)}
+              onClick={() => giorniPerStato[dataKey] && onDayClick(dataKey)}
+            >
+              {giorno}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// --- COMPONENTE PRINCIPALE ---
+
+function App() {
+  const [step, setStep] = useState(1);
+  const [startDate, setStartDate] = useState(CICLO_ESISTENTE.dataInizioDefault);
+  const [endDate, setEndDate] = useState(CICLO_ESISTENTE.dataFineDefault);
+
+  const giorniSettimana = ["LUN", "MAR", "MER", "GIO", "VEN"];
+  const fasceOrarie = [
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+  ];
+
+  const [patientAvailability, setPatientAvailability] = useState(() => {
+    const availability = {};
+    giorniSettimana.forEach((giorno) => {
+      availability[giorno] = {};
+      fasceOrarie.forEach((ora) => {
+        availability[giorno][ora] = false;
+      });
+    });
+    return availability;
+  });
+
+  const [filters, setFilters] = useState({
+    preferenzaTerapistaUnico: false,
+    avviaPrimaPossibile: false,
+    terapistiPiuScarichi: false,
+  });
+
+  const [selectedDays, setSelectedDays] = useState([]);
+
+  const handleAvailabilityChange = (giorno, ora) => {
+    setPatientAvailability((prev) => ({
+      ...prev,
+      [giorno]: {
+        ...prev[giorno],
+        [ora]: !prev[giorno][ora],
+      },
+    }));
+  };
+
+  const handleFilterChange = (filterName) => {
+    setFilters((prev) => ({ ...prev, [filterName]: !prev[filterName] }));
+  };
+
+  const handleDayClick = (day) => {
+    setSelectedDays((prev) => {
+      const isSelected = prev.includes(day);
+      if (isSelected) {
+        return prev.filter((d) => d !== day);
+      } else {
+        return [...prev, day].sort(); // Mantieni i giorni ordinati
+      }
+    });
+  };
+
+  // Logica di elaborazione degli slot (il cuore dell'applicazione)
+  const processedData = useMemo(() => {
+    const dayMap = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
+
+    const patientMatchingSlots = SLOT_DISPONIBILI_TERAPISTI.map((slot) => {
+      const slotDate = new Date(slot.data);
+      const dayOfWeek = dayMap[slotDate.getDay()];
+      const isPatientAvailable =
+        patientAvailability[dayOfWeek]?.[slot.ora] || false;
+
+      return {
+        ...slot,
+        terapista: TERAPISTI.find((t) => t.id === slot.terapistaId),
+        status: isPatientAvailable ? "blue" : "grey",
+      };
+    });
+
+    let finalSlots = patientMatchingSlots;
+
+    if (filters.terapistiPiuScarichi || filters.preferenzaTerapistaUnico) {
+      const blueSlots = finalSlots.filter((s) => s.status === "blue");
+      let filteredByWorkload = [...blueSlots];
+      if (filters.terapistiPiuScarichi) {
+        const avgWorkload =
+          TERAPISTI.reduce((acc, t) => acc + t.caricoLavoro, 0) /
+          TERAPISTI.length;
+        filteredByWorkload = blueSlots.filter(
+          (s) => s.terapista.caricoLavoro < avgWorkload + 10
+        );
+      }
+
+      let filteredByUniqueTherapist = [...filteredByWorkload];
+      if (filters.preferenzaTerapistaUnico && filteredByWorkload.length > 0) {
+        const therapistCounts = filteredByWorkload.reduce((acc, slot) => {
+          acc[slot.terapistaId] = (acc[slot.terapistaId] || 0) + 1;
+          return acc;
+        }, {});
+
+        const bestTherapistId = Object.keys(therapistCounts).reduce((a, b) =>
+          therapistCounts[a] > therapistCounts[b] ? a : b
+        );
+
+        if (therapistCounts[bestTherapistId] >= CICLO_ESISTENTE.seduteTotali) {
+          filteredByUniqueTherapist = filteredByWorkload.filter(
+            (s) => String(s.terapistaId) === bestTherapistId
+          );
+        }
+      }
+
+      const greenSlotIds = new Set(
+        filteredByUniqueTherapist.map(
+          (s) => `${s.data}-${s.ora}-${s.terapistaId}`
+        )
+      );
+
+      finalSlots = finalSlots.map((slot) => ({
+        ...slot,
+        status: greenSlotIds.has(`${slot.data}-${slot.ora}-${slot.terapistaId}`)
+          ? "green"
+          : slot.status,
+      }));
+    } else {
+      finalSlots = finalSlots.map((slot) =>
+        slot.status === "blue" ? { ...slot, status: "green" } : slot
+      );
+    }
+
+    if (filters.avviaPrimaPossibile) {
+      finalSlots.sort(
+        (a, b) =>
+          new Date(a.data) - new Date(b.data) || a.ora.localeCompare(b.ora)
+      );
+    }
+
+    const availableGreenSlotsCount = finalSlots.filter(
+      (s) => s.status === "green"
+    ).length;
+    let warningMessage = null;
+    if (availableGreenSlotsCount < CICLO_ESISTENTE.seduteTotali) {
+      warningMessage = `Attenzione: Sono stati trovati solo ${availableGreenSlotsCount} slot che soddisfano tutti i filtri, ma ne servono ${CICLO_ESISTENTE.seduteTotali}. Prova a disattivare qualche filtro o esplora le opzioni colorate per trovare più disponibilità.`;
+    }
+
+    return { slots: finalSlots, warningMessage };
+  }, [patientAvailability, filters]);
+
+  const slotsForSelectedDays = useMemo(() => {
+    if (selectedDays.length === 0) return [];
+    return processedData.slots
+      .filter((slot) => selectedDays.includes(slot.data))
+      .sort(
+        (a, b) => a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora)
+      );
+  }, [selectedDays, processedData.slots]);
+
+  // --- RENDER ---
+
+  const renderStep1 = () => (
+    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-7xl w-full border border-gray-200">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">
+        Programmazione Ciclo Medico
+      </h1>
+      <p className="text-gray-500 mb-8">
+        Step 1: Dati del Ciclo e Disponibilità Paziente
+      </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-200 pb-2">
+            Dati del Ciclo
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Nome Ciclo
+              </label>
+              <p className="text-md text-gray-900 font-semibold">
+                {CICLO_ESISTENTE.nome}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                N° Sedute Richieste
+              </label>
+              <p className="text-md text-gray-900">
+                {CICLO_ESISTENTE.seduteTotali}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Frequenza
+              </label>
+              <p className="text-md text-gray-900">
+                {CICLO_ESISTENTE.frequenzaDefault}
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="startDate"
+                className="text-sm font-medium text-gray-600"
+              >
+                Data Inizio Ciclo
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="endDate"
+                className="text-sm font-medium text-gray-600"
+              >
+                Data Fine Ciclo
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-2 bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-200 pb-2">
+            Disponibilità del Paziente
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th className="p-2 text-sm font-semibold text-gray-600">
+                    Orario
+                  </th>
+                  {giorniSettimana.map((giorno) => (
+                    <th
+                      key={giorno}
+                      className="p-2 text-center text-sm font-semibold text-gray-600"
+                    >
+                      {giorno}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {fasceOrarie.map((ora) => (
+                  <tr key={ora} className="border-t border-gray-200">
+                    <td className="p-2 font-mono text-gray-700">{ora}</td>
+                    {giorniSettimana.map((giorno) => (
+                      <td key={`${giorno}-${ora}`} className="p-2 text-center">
+                        <input
+                          type="checkbox"
+                          checked={patientAvailability[giorno][ora]}
+                          onChange={() => handleAvailabilityChange(giorno, ora)}
+                          className="w-5 h-5 rounded text-rose-600 focus:ring-rose-500 cursor-pointer border-gray-300"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-end border-t border-gray-200 pt-6">
+        <button
+          onClick={() => setStep(2)}
+          className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+        >
+          Cerca Soluzioni
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderStep2 = () => (
+    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-7xl w-full border border-gray-200">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">
+        Risultati della Ricerca
+      </h1>
+      <p className="text-gray-500 mb-6">Step 2: Filtri e Risultati</p>
+
+      {processedData.warningMessage && (
+        <div
+          className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg mb-6"
+          role="alert"
+        >
+          <p className="font-bold">Slot insufficienti</p>
+          <p>{processedData.warningMessage}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-3">
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 h-fit">
+            <h2 className="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-200 pb-2">
+              Filtri
+            </h2>
+            <div className="space-y-6">
+              <ToggleSwitch
+                label="Terapista unico"
+                checked={filters.preferenzaTerapistaUnico}
+                onChange={() => handleFilterChange("preferenzaTerapistaUnico")}
+              />
+              <ToggleSwitch
+                label="Avvia prima possibile"
+                checked={filters.avviaPrimaPossibile}
+                onChange={() => handleFilterChange("avviaPrimaPossibile")}
+              />
+              <ToggleSwitch
+                label="Terapisti scarichi"
+                checked={filters.terapistiPiuScarichi}
+                onChange={() => handleFilterChange("terapistiPiuScarichi")}
+              />
+            </div>
+            <div className="mt-8 border-t border-gray-200 pt-4">
+              <h3 className="font-semibold text-gray-700 mb-2">
+                Legenda Colori
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-rose-500 mr-2 border border-rose-600"></span>
+                  Disponibile e filtrato
+                </li>
+                <li className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-rose-200 mr-2 border border-rose-300"></span>
+                  Paziente e Terapista
+                </li>
+                <li className="flex items-center">
+                  <span className="w-4 h-4 rounded-full bg-gray-200 mr-2 border border-gray-300"></span>
+                  Solo Terapista
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-9 space-y-8">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Livello 1: Seleziona i Giorni (Settembre 2025)
+            </h2>
+            <CalendarioMensile
+              slots={processedData.slots}
+              onDayClick={handleDayClick}
+              selectedDays={selectedDays}
+            />
+          </div>
+
+          {selectedDays.length > 0 && (
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 mb-4">
+                Livello 2: Orari disponibili per i giorni scelti
+              </h2>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-96 overflow-y-auto">
+                {slotsForSelectedDays.length > 0 ? (
+                  <ul className="space-y-2">
+                    {slotsForSelectedDays.map((slot, index) => {
+                      const statusColor = {
+                        green: "border-rose-500 bg-white",
+                        blue: "border-rose-200 bg-white",
+                        grey: "border-gray-300 bg-gray-50",
+                      }[slot.status];
+
+                      return (
+                        <li
+                          key={index}
+                          className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm ${statusColor}`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+                            <span className="font-bold text-gray-800">
+                              {slot.data}
+                            </span>
+                            <span className="font-mono text-gray-600">
+                              {slot.ora}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm text-gray-700">
+                              {slot.terapista.nome}
+                            </span>
+                            <span className="text-xs text-gray-500 block">
+                              Carico: {slot.terapista.caricoLavoro}%
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-center text-gray-500 p-8">
+                    Nessuno slot disponibile per i giorni selezionati.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-between items-center border-t border-gray-200 pt-6">
+        <button
+          onClick={() => setStep(1)}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors"
+        >
+          Indietro
+        </button>
+        <button
+          onClick={() => alert("Prenotazione confermata! (Simulazione)")}
+          className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={selectedDays.length === 0}
+        >
+          Conferma Prenotazione
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="bg-gray-100 min-h-screen text-gray-800 p-4 sm:p-8 font-sans flex items-center justify-center">
+      {step === 1 ? renderStep1() : renderStep2()}
+    </div>
+  );
+}
+
+export default App;
