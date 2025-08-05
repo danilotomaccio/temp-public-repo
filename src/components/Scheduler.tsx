@@ -308,12 +308,14 @@ interface CartModalProps {
   appointments: SlotProcessato[];
   onClose: () => void;
   onConfirm: () => void;
+  totalSessions: number;
 }
 
 const CartModal: FC<CartModalProps> = ({
   appointments,
   onClose,
   onConfirm,
+  totalSessions,
 }) => {
   const sortedAppointments = [...appointments].sort(
     (a, b) => a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora)
@@ -324,7 +326,8 @@ const CartModal: FC<CartModalProps> = ({
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200 flex flex-col">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-800">
-            Riepilogo Appuntamenti Selezionati ({appointments.length})
+            Riepilogo Appuntamenti Selezionati ({appointments.length} /{" "}
+            {totalSessions})
           </h2>
           <button
             onClick={onClose}
@@ -379,7 +382,7 @@ const CartModal: FC<CartModalProps> = ({
           <button
             onClick={onConfirm}
             className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400"
-            disabled={appointments.length === 0}
+            disabled={appointments.length !== totalSessions}
           >
             Conferma Appuntamenti
           </button>
@@ -1186,6 +1189,7 @@ export const Scheduler: FC<SchedulerProps> = ({
           appointments={selectedAppointments}
           onClose={() => setIsCartOpen(false)}
           onConfirm={handleConfirmAppointments}
+          totalSessions={totalSessions}
         />
       )}
     </div>

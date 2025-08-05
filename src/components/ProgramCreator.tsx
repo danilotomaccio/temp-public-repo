@@ -144,7 +144,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all duration-300 ${
+        className={`bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col transform transition-all duration-300 ${
           showContent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
         onClick={(e) => e.stopPropagation()}
