@@ -48,6 +48,40 @@ const ChevronDownIcon: FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
+const CartIcon: FC = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-6 w-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+);
+
+const CloseIcon: FC = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-6 w-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+);
+
 // --- DEFINIZIONE DEI TIPI (TYPESCRIPT) ---
 
 interface Terapista {
@@ -270,6 +304,91 @@ const CalendarioMensile: FC<CalendarioMensileProps> = ({
   );
 };
 
+interface CartModalProps {
+  appointments: SlotProcessato[];
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+const CartModal: FC<CartModalProps> = ({
+  appointments,
+  onClose,
+  onConfirm,
+}) => {
+  const sortedAppointments = [...appointments].sort(
+    (a, b) => a.data.localeCompare(b.data) || a.ora.localeCompare(b.ora)
+  );
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200 flex flex-col">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-800">
+            Riepilogo Appuntamenti Selezionati ({appointments.length})
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <div
+          className="p-6 space-y-4 overflow-y-auto"
+          style={{ maxHeight: "60vh" }}
+        >
+          {sortedAppointments.length > 0 ? (
+            sortedAppointments.map((app, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border"
+              >
+                <div>
+                  <p className="font-bold text-gray-800">
+                    {new Date(app.data).toLocaleDateString("it-IT", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </p>
+                  <p className="text-gray-600">
+                    Ore: <span className="font-mono">{app.ora}</span>
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-800">{app.terapista.nome}</p>
+                  <p className="text-sm text-gray-500">
+                    Carico: {app.terapista.caricoLavoro}%
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 py-8">
+              Nessun appuntamento selezionato.
+            </p>
+          )}
+        </div>
+        <div className="flex justify-end items-center p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+          <button
+            onClick={onClose}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors mr-4"
+          >
+            Annulla
+          </button>
+          <button
+            onClick={onConfirm}
+            className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400"
+            disabled={appointments.length === 0}
+          >
+            Conferma Appuntamenti
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- COMPONENTE PRINCIPALE ---
 
 const App: FC = () => {
@@ -328,6 +447,7 @@ const App: FC = () => {
     SlotProcessato[]
   >([]);
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
   const handleAvailabilityChange = (
     giorno: string,
@@ -336,6 +456,8 @@ const App: FC = () => {
   ) => {
     const isShiftPressed = event.nativeEvent.shiftKey;
     const newAvailability = JSON.parse(JSON.stringify(patientAvailability));
+
+    const targetState = !newAvailability[giorno][ora];
 
     if (isShiftPressed && lastClickedSlot) {
       const allSlots = giorniSettimana.flatMap((g) =>
@@ -356,15 +478,14 @@ const App: FC = () => {
 
         for (let i = rangeStart; i <= rangeEnd; i++) {
           const slotToUpdate = allSlots[i];
-          newAvailability[slotToUpdate.giorno][slotToUpdate.ora] = true;
+          newAvailability[slotToUpdate.giorno][slotToUpdate.ora] = targetState;
         }
-        setPatientAvailability(newAvailability);
       }
     } else {
-      newAvailability[giorno][ora] = !newAvailability[giorno][ora];
-      setPatientAvailability(newAvailability);
+      newAvailability[giorno][ora] = targetState;
     }
 
+    setPatientAvailability(newAvailability);
     setLastClickedSlot({ giorno, ora });
   };
 
@@ -436,6 +557,13 @@ const App: FC = () => {
       }
       return newSet;
     });
+  };
+
+  const handleConfirmAppointments = () => {
+    alert(
+      `Prenotazione confermata per ${selectedAppointments.length} appuntamenti! (Simulazione)`
+    );
+    setIsCartOpen(false);
   };
 
   const bookedDates = useMemo(
@@ -565,6 +693,9 @@ const App: FC = () => {
       if (sortBy === "best") {
         const statusOrder = { green: 0, blue: 1, grey: 2 };
         grouped[date].sort((a, b) => {
+          if (a.terapista.caricoLavoro !== b.terapista.caricoLavoro) {
+            return a.terapista.caricoLavoro - b.terapista.caricoLavoro;
+          }
           if (statusOrder[a.status] !== statusOrder[b.status]) {
             return statusOrder[a.status] - statusOrder[b.status];
           }
@@ -752,10 +883,25 @@ const App: FC = () => {
 
   const renderStep2 = () => (
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-7xl w-full border border-gray-200">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">
-        Risultati della Ricerca
-      </h1>
-      <p className="text-gray-500 mb-6">Step 2: Filtri e Risultati</p>
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Risultati della Ricerca
+          </h1>
+          <p className="text-gray-500">Step 2: Filtri e Risultati</p>
+        </div>
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600"
+        >
+          <CartIcon />
+          {selectedAppointments.length > 0 && (
+            <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-rose-600 text-white text-xs flex items-center justify-center transform -translate-y-1/2 translate-x-1/2">
+              {selectedAppointments.length}
+            </span>
+          )}
+        </button>
+      </div>
 
       {processedData.warningMessage && (
         <div
@@ -1026,13 +1172,20 @@ const App: FC = () => {
           Indietro
         </button>
         <button
-          onClick={() => alert("Prenotazione confermata! (Simulazione)")}
+          onClick={() => setIsCartOpen(true)}
           className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
           disabled={selectedAppointments.length === 0}
         >
-          Conferma Prenotazione
+          Rivedi e Conferma ({selectedAppointments.length})
         </button>
       </div>
+      {isCartOpen && (
+        <CartModal
+          appointments={selectedAppointments}
+          onClose={() => setIsCartOpen(false)}
+          onConfirm={handleConfirmAppointments}
+        />
+      )}
     </div>
   );
 
