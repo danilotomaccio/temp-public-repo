@@ -525,14 +525,24 @@ const App: FC = () => {
   };
 
   const handleAppointmentSelect = (clickedSlot: SlotProcessato) => {
+    const isCurrentlySelected = selectedAppointments.some(
+      (s) =>
+        s.data === clickedSlot.data &&
+        s.ora === clickedSlot.ora &&
+        s.terapistaId === clickedSlot.terapistaId
+    );
+
+    if (!isCurrentlySelected) {
+      // Se sto aggiungendo un appuntamento, collasso il giorno
+      setCollapsedDays((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(clickedSlot.data);
+        return newSet;
+      });
+    }
+
     setSelectedAppointments((prev) => {
-      const isSelected = prev.some(
-        (s) =>
-          s.data === clickedSlot.data &&
-          s.ora === clickedSlot.ora &&
-          s.terapistaId === clickedSlot.terapistaId
-      );
-      if (isSelected) {
+      if (isCurrentlySelected) {
         return prev.filter(
           (s) =>
             !(
