@@ -182,7 +182,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, checked, onChange }) => (
       />
       <div
         className={`block w-14 h-8 rounded-full transition-colors ${
-          checked ? "bg-rose-600" : "bg-gray-300"
+          checked ? "bg-[#8c2d52]" : "bg-gray-300"
         }`}
       ></div>
       <div
@@ -207,7 +207,7 @@ const Checkbox: FC<CheckboxProps> = ({ label, checked, onChange }) => (
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+      className="h-4 w-4 rounded border-gray-300 text-[#8c2d52] focus:ring-[#8c2d52]"
     />
     <span className="ml-2">{label}</span>
   </label>
@@ -252,20 +252,20 @@ const CalendarioMensile: FC<CalendarioMensileProps> = ({
       "w-11 h-11 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200";
 
     if (isBooked) {
-      return `${baseClass} bg-rose-800 text-white font-bold hover:bg-rose-900`;
+      return `${baseClass} bg-gray-700 text-white font-bold hover:bg-gray-800`;
     }
 
     if (!stato)
       return `${baseClass} bg-gray-100 text-gray-400 cursor-not-allowed`;
 
     if (stato.hasGreen)
-      baseClass += " bg-rose-500 hover:bg-rose-600 text-white";
+      baseClass += " bg-[#8c2d52] hover:bg-[#7a2644] text-white";
     else if (stato.hasBlue)
       baseClass += " bg-rose-200 hover:bg-rose-300 text-rose-800";
     else baseClass += " bg-gray-200 hover:bg-gray-300 text-gray-600";
 
     if (selectedDays.includes(dataKey)) {
-      baseClass += " ring-4 ring-offset-2 ring-offset-white ring-rose-500";
+      baseClass += " ring-4 ring-offset-2 ring-offset-white ring-[#8c2d52]";
     }
 
     return baseClass;
@@ -381,7 +381,7 @@ const CartModal: FC<CartModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
-            className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400"
+            className="bg-[#8c2d52] hover:bg-[#7a2644] text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400"
             disabled={appointments.length !== totalSessions}
           >
             Conferma Appuntamenti
@@ -765,7 +765,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                 id="frequenza"
                 value={frequenza}
                 onChange={(e) => setFrequenza(e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#8c2d52] outline-none"
               />
             </div>
             <div>
@@ -780,7 +780,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                 id="startDate"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#8c2d52] outline-none"
               />
             </div>
             <div>
@@ -795,7 +795,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                 id="endDate"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#8c2d52] outline-none"
               />
             </div>
           </div>
@@ -863,7 +863,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                             handleAvailabilityChange(giorno, ora, e)
                           }
                           onChange={() => {}} // Dummy onChange per evitare warning di React
-                          className="w-5 h-5 rounded text-rose-600 focus:ring-rose-500 cursor-pointer border-gray-300"
+                          className="w-5 h-5 rounded text-[#8c2d52] focus:ring-[#8c2d52] cursor-pointer border-gray-300"
                         />
                       </td>
                     ))}
@@ -878,7 +878,7 @@ export const Scheduler: FC<SchedulerProps> = ({
       <div className="mt-8 flex justify-end border-t border-gray-200 pt-6">
         <button
           onClick={() => setStep(2)}
-          className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+          className="bg-[#8c2d52] hover:bg-[#7a2644] text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
         >
           Cerca Soluzioni
         </button>
@@ -901,7 +901,7 @@ export const Scheduler: FC<SchedulerProps> = ({
         >
           <CartIcon />
           {selectedAppointments.length > 0 && (
-            <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-rose-600 text-white text-xs flex items-center justify-center transform -translate-y-1/2 translate-x-1/2">
+            <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-[#8c2d52] text-white text-xs flex items-center justify-center transform -translate-y-1/2 translate-x-1/2">
               {selectedAppointments.length}
             </span>
           )}
@@ -934,7 +934,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                     onClick={() => setSelectedTherapistId(null)}
                     className={`py-1 px-3 rounded-full text-sm font-semibold transition-colors ${
                       selectedTherapistId === null
-                        ? "bg-rose-600 text-white"
+                        ? "bg-[#8c2d52] text-white"
                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
                     }`}
                   >
@@ -946,7 +946,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                       onClick={() => setSelectedTherapistId(terapista.id)}
                       className={`py-1 px-3 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
                         selectedTherapistId === terapista.id
-                          ? "bg-rose-600 text-white"
+                          ? "bg-[#8c2d52] text-white"
                           : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
                       }`}
                     >
@@ -990,11 +990,11 @@ export const Scheduler: FC<SchedulerProps> = ({
               </h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-rose-800 mr-2 border border-rose-900"></span>
+                  <span className="w-4 h-4 rounded-full bg-gray-700 mr-2 border border-gray-800"></span>
                   Appuntamento Selezionato
                 </li>
                 <li className="flex items-center">
-                  <span className="w-4 h-4 rounded-full bg-rose-500 mr-2 border border-rose-600"></span>
+                  <span className="w-4 h-4 rounded-full bg-[#8c2d52] mr-2 border border-[#7a2644]"></span>
                   Disponibile e filtrato
                 </li>
                 <li className="flex items-center">
@@ -1037,7 +1037,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                     onClick={() => setTimeFilter("all")}
                     className={`text-xs font-semibold py-1 px-3 rounded-full ${
                       timeFilter === "all"
-                        ? "bg-rose-600 text-white"
+                        ? "bg-[#8c2d52] text-white"
                         : "bg-white text-gray-600 border"
                     }`}
                   >
@@ -1047,7 +1047,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                     onClick={() => setTimeFilter("morning")}
                     className={`text-xs font-semibold py-1 px-3 rounded-full ${
                       timeFilter === "morning"
-                        ? "bg-rose-600 text-white"
+                        ? "bg-[#8c2d52] text-white"
                         : "bg-white text-gray-600 border"
                     }`}
                   >
@@ -1057,7 +1057,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                     onClick={() => setTimeFilter("afternoon")}
                     className={`text-xs font-semibold py-1 px-3 rounded-full ${
                       timeFilter === "afternoon"
-                        ? "bg-rose-600 text-white"
+                        ? "bg-[#8c2d52] text-white"
                         : "bg-white text-gray-600 border"
                     }`}
                   >
@@ -1123,7 +1123,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                                 s.terapistaId === slot.terapistaId
                             );
                             const statusColor = {
-                              green: "border-rose-500 bg-white",
+                              green: "border-[#8c2d52] bg-white",
                               blue: "border-rose-200 bg-white",
                               grey: "border-gray-300 bg-gray-50 text-gray-500",
                             }[slot.status];
@@ -1134,7 +1134,7 @@ export const Scheduler: FC<SchedulerProps> = ({
                                 onClick={() => handleAppointmentSelect(slot)}
                                 className={`flex justify-between items-center p-3 rounded-lg border-l-4 shadow-sm cursor-pointer transition-all ${statusColor} ${
                                   isSelected
-                                    ? "ring-2 ring-offset-2 ring-rose-600"
+                                    ? "ring-2 ring-offset-2 ring-[#8c2d52]"
                                     : ""
                                 }`}
                               >
@@ -1178,7 +1178,7 @@ export const Scheduler: FC<SchedulerProps> = ({
         </button>
         <button
           onClick={() => setIsCartOpen(true)}
-          className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="bg-[#8c2d52] hover:bg-[#7a2644] text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
           disabled={selectedAppointments.length === 0}
         >
           Rivedi e Conferma ({selectedAppointments.length})

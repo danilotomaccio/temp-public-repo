@@ -73,7 +73,7 @@ export const MainController: FC = () => {
                 <li key={cycle.id}>
                   <button
                     onClick={() => handleCycleSelect(cycle)}
-                    className="text-purple-600 hover:text-purple-800 font-semibold hover:underline"
+                    className="text-[#8c2d52] hover:text-[#7a2644] font-semibold hover:underline"
                   >
                     {cycleInfo.name}
                   </button>

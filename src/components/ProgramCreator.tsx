@@ -202,7 +202,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
                         onChange={(e) =>
                           handleCycleChange(index, "cycleId", e.target.value)
                         }
-                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
                       >
                         <option value="" disabled>
                           Scegli un'attività...
@@ -235,7 +235,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
                               e.target.value
                             )
                           }
-                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
                         />
                         <span className="text-gray-500">-</span>
                         <input
@@ -244,7 +244,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
                           onChange={(e) =>
                             handleCycleChange(index, "endDate", e.target.value)
                           }
-                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
                         />
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
@@ -285,7 +285,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
               value={program.notes}
               onChange={handleNotesChange}
               rows={3}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
               placeholder="Aggiungi una nota interna per il desk..."
             ></textarea>
           </div>
@@ -301,7 +301,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
           </button>
           <button
             onClick={handleSave}
-            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors shadow"
+            className="bg-[#8c2d52] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#7a2644] transition-colors shadow"
           >
             Salva Programma
           </button>
@@ -312,14 +312,13 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
 };
 
 // --- COMPONENTE CREATORE (Componente "smart" che gestisce la logica) ---
-export const ProgramCreator: FC<ProgramCreatorProps> = ({ onProgramCreate }) => {
+export const ProgramCreator: FC<ProgramCreatorProps> = ({
+  onProgramCreate,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleSaveProgram = (programData: Program): void => {
     onProgramCreate(programData); // "Solleva" i dati al componente genitore
-    alert(
-      "Programma salvato! I dati sono stati passati al componente genitore."
-    );
     setIsModalOpen(false);
   };
 
@@ -334,7 +333,7 @@ export const ProgramCreator: FC<ProgramCreatorProps> = ({ onProgramCreate }) => 
 
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors shadow"
+        className="bg-[#8c2d52] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#7a2644] transition-colors shadow"
       >
         + Crea Nuovo Programma
       </button>
