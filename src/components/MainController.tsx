@@ -1,6 +1,7 @@
 import { type FC, useState } from "react";
 import { ProgramCreator } from "./ProgramCreator";
 import { Scheduler } from "./Scheduler";
+import { GlobalScheduleView } from "./GlobalScheduleView"; // Importa il nuovo componente dal file corretto
 
 // --- TIPI CONDIVISI ---
 interface Cycle {
@@ -21,7 +22,7 @@ interface Program {
   notes: string;
 }
 
-// --- DATI DI ESEMPIO (spostati qui per essere accessibili da più componenti) ---
+// --- DATI DI ESEMPIO ---
 const AVAILABLE_CYCLES: Cycle[] = [
   { id: 1, name: "Rieducazione Motoria Arti Inferiori", sessions: 10 },
   { id: 2, name: "Fisioterapia Post-operatoria Spalla", sessions: 12 },
@@ -31,25 +32,33 @@ const AVAILABLE_CYCLES: Cycle[] = [
 ];
 
 export const MainController: FC = () => {
-  // Stato per memorizzare il programma salvato
   const [savedProgram, setSavedProgram] = useState<Program | null>(null);
-  // Stato per memorizzare il ciclo selezionato da passare allo Scheduler
   const [selectedCycle, setSelectedCycle] = useState<ProgramCycle | null>(null);
+  const [scheduleConfirmed, setScheduleConfirmed] = useState<boolean>(false);
 
-  // Funzione per ricevere i dati dal ProgramCreator
   const handleProgramCreated = (program: Program) => {
     setSavedProgram(program);
+    setScheduleConfirmed(false);
   };
 
-  // Funzione per selezionare un ciclo e mostrare lo Scheduler
   const handleCycleSelect = (cycle: ProgramCycle) => {
     setSelectedCycle(cycle);
   };
 
-  // Funzione per tornare alla lista dei cicli dallo Scheduler
   const handleBackToList = () => {
     setSelectedCycle(null);
   };
+
+  const handleScheduleConfirmation = () => {
+    setSelectedCycle(null);
+    setSavedProgram(null);
+    setScheduleConfirmed(true);
+  };
+
+  // --- VISTA CALENDARIO GLOBALE ---
+  if (scheduleConfirmed) {
+    return <GlobalScheduleView />;
+  }
 
   // --- VISTA LISTA CICLI ---
   if (savedProgram && !selectedCycle) {
@@ -94,7 +103,10 @@ export const MainController: FC = () => {
         </div>
         <div className="mt-6 border-t pt-4 text-right">
           <button
-            onClick={() => setSavedProgram(null)}
+            onClick={() => {
+              setSavedProgram(null);
+              setScheduleConfirmed(false); // Torna alla schermata iniziale
+            }}
             className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
           >
             Crea un altro programma
@@ -129,7 +141,7 @@ export const MainController: FC = () => {
         <Scheduler
           cycleName={cycleInfo.name}
           totalSessions={cycleInfo.sessions}
-          defaultFrequency="2 volte/settimana" // Dati di esempio
+          defaultFrequency="2 volte/settimana"
           defaultStartDate={
             selectedCycle.startDate || new Date().toISOString().split("T")[0]
           }
@@ -139,6 +151,7 @@ export const MainController: FC = () => {
               .toISOString()
               .split("T")[0]
           }
+          onConfirmSchedule={handleScheduleConfirmation}
         />
       </div>
     );

@@ -117,6 +117,7 @@ interface SchedulerProps {
   defaultFrequency: string;
   defaultStartDate: string;
   defaultEndDate: string;
+  onConfirmSchedule: () => void; // Aggiunta prop per notificare la conferma
 }
 
 // --- DATI FITTIZI (MOCK DATA) ---
@@ -322,7 +323,7 @@ const CartModal: FC<CartModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black/50 z-40 flex justify-center items-center">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200 flex flex-col">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-800">
@@ -400,6 +401,7 @@ export const Scheduler: FC<SchedulerProps> = ({
   defaultFrequency,
   defaultStartDate,
   defaultEndDate,
+  onConfirmSchedule,
 }) => {
   const [step, setStep] = useState<number>(1);
   const [startDate, setStartDate] = useState<string>(defaultStartDate);
@@ -572,10 +574,10 @@ export const Scheduler: FC<SchedulerProps> = ({
   };
 
   const handleConfirmAppointments = () => {
-    alert(
-      `Prenotazione confermata per ${selectedAppointments.length} appuntamenti! (Simulazione)`
-    );
+    // Qui potresti inviare gli appuntamenti a un'API
+    console.log("Appuntamenti confermati (simulazione):", selectedAppointments);
     setIsCartOpen(false);
+    onConfirmSchedule(); // Notifica il MainController
   };
 
   const bookedDates = useMemo(
