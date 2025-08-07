@@ -92,14 +92,14 @@ export const MainController: FC = () => {
               );
             })}
           </ul>
-          {savedProgram.notes && (
+          {/* {savedProgram.notes && (
             <>
               <h3 className="font-semibold text-gray-700 pt-2">Note:</h3>
               <p className="text-gray-600 bg-gray-50 p-3 rounded-md">
                 {savedProgram.notes}
               </p>
             </>
-          )}
+          )} */}
         </div>
         <div className="mt-6 border-t pt-4 text-right">
           <button
@@ -117,7 +117,7 @@ export const MainController: FC = () => {
   }
 
   // --- VISTA SCHEDULER ---
-  if (selectedCycle) {
+  if (selectedCycle && savedProgram) {
     const cycleInfo = AVAILABLE_CYCLES.find(
       (c) => c.id === selectedCycle.cycleId
     );
@@ -151,6 +151,7 @@ export const MainController: FC = () => {
               .toISOString()
               .split("T")[0]
           }
+          notes={savedProgram.notes}
           onConfirmSchedule={handleScheduleConfirmation}
         />
       </div>

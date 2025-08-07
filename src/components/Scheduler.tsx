@@ -117,6 +117,7 @@ interface SchedulerProps {
   defaultFrequency: string;
   defaultStartDate: string;
   defaultEndDate: string;
+  notes: string;
   onConfirmSchedule: () => void; // Aggiunta prop per notificare la conferma
 }
 
@@ -273,7 +274,7 @@ const CalendarioMensile: FC<CalendarioMensileProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 h-full">
+    <div className="bg-white p-4 rounded-lg border border-gray-200">
       <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-500 mb-2">
         <div>LUN</div>
         <div>MAR</div>
@@ -401,6 +402,7 @@ export const Scheduler: FC<SchedulerProps> = ({
   defaultFrequency,
   defaultStartDate,
   defaultEndDate,
+  notes,
   onConfirmSchedule,
 }) => {
   const [step, setStep] = useState<number>(1);
@@ -800,6 +802,16 @@ export const Scheduler: FC<SchedulerProps> = ({
                 className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#8c2d52] outline-none"
               />
             </div>
+            {notes && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Note
+                </label>
+                <p className="text-md text-gray-900 bg-yellow-100 p-2 rounded-md mt-1 border border-yellow-200">
+                  {notes}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
