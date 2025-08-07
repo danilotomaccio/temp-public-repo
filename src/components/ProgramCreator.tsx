@@ -152,7 +152,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-800">
-            Nuovo Programma Terapeutico
+            Nuovo Trattamento
           </h2>
           <button
             onClick={onClose}
@@ -180,7 +180,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
           {/* Sezione Cicli */}
           <div>
             <h3 className="text-lg font-medium text-gray-700 mb-4">
-              Cicli del Programma
+              Cicli del Trattamento
             </h3>
             <div className="space-y-4">
               {program.cycles.map((cycle, index) => (
@@ -303,7 +303,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
             onClick={handleSave}
             className="bg-[#8c2d52] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#7a2644] transition-colors shadow"
           >
-            Salva Programma
+            Salva Trattamento
           </button>
         </div>
       </div>
@@ -335,7 +335,7 @@ export const ProgramCreator: FC<ProgramCreatorProps> = ({
         onClick={() => setIsModalOpen(true)}
         className="bg-[#8c2d52] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#7a2644] transition-colors shadow"
       >
-        + Crea Nuovo Programma
+        + Crea nuovo Trattamento
       </button>
 
       <ProgramModal
