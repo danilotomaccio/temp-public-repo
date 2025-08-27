@@ -164,15 +164,6 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
 
   // --- FUNZIONI HELPER ---
 
-  const getCycleInfo = (
-    cycleId: number | null,
-    infoKey: keyof Omit<Cycle, "id">
-  ): string | number => {
-    if (cycleId === null) return "N/A";
-    const found = AVAILABLE_CYCLES.find((c) => c.id === cycleId);
-    return found ? found[infoKey] : "N/A";
-  };
-
   const getProductInfo = (
     productId: number | null,
     cycleId: number | null,
