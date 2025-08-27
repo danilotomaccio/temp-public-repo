@@ -9,10 +9,18 @@ interface Cycle {
   sessions: number;
 }
 
+// Definisce la struttura di un prodotto/opzione legata ad un'attività
+interface Product {
+  id: number;
+  name: string;
+  sessions: number;
+}
+
 // Definisce la struttura di un ciclo all'interno del programma in creazione
 interface ProgramCycle {
   id: number; // ID univoco per la chiave di React
   cycleId: number | null;
+  productId: number | null; // <-- nuova proprietà per il prodotto/pacchetto selezionato
   startDate: string;
   endDate: string;
 }
@@ -45,6 +53,31 @@ const AVAILABLE_CYCLES: Cycle[] = [
   { id: 5, name: "Ginnastica Correttiva", sessions: 20 },
 ];
 
+// Esempio di prodotti disponibili per ciascun ciclo (mappa cycleId => prodotti)
+const PRODUCTS_BY_CYCLE: Record<number, Product[]> = {
+  1: [
+    { id: 101, name: "Pacchetto 5 sedute", sessions: 5 },
+    { id: 102, name: "Pacchetto 10 sedute", sessions: 10 },
+  ],
+  2: [
+    { id: 201, name: "Pacchetto 6 sedute", sessions: 6 },
+    { id: 202, name: "Pacchetto 12 sedute", sessions: 12 },
+  ],
+  3: [
+    { id: 301, name: "Pacchetto 4 sedute", sessions: 4 },
+    { id: 302, name: "Pacchetto 8 sedute", sessions: 8 },
+  ],
+  4: [
+    { id: 401, name: "Pacchetto 5 sedute", sessions: 5 },
+    { id: 402, name: "Pacchetto 8 sedute", sessions: 8 },
+    { id: 403, name: "Pacchetto 15 sedute", sessions: 15 },
+  ],
+  5: [
+    { id: 501, name: "Pacchetto 10 sedute", sessions: 10 },
+    { id: 502, name: "Pacchetto 20 sedute", sessions: 20 },
+  ],
+};
+
 // --- COMPONENTE MODALE (Componente "dumb" per la UI) ---
 const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
   // Stato interno del form, ora con tipo Program
@@ -56,7 +89,9 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
     if (isOpen) {
       // Resetta il form e aggiunge un ciclo di default all'apertura
       setProgram({
-        cycles: [{ id: Date.now(), cycleId: null, startDate: "", endDate: "" }],
+        cycles: [
+          { id: Date.now(), cycleId: null, productId: null, startDate: "", endDate: "" },
+        ],
         notes: "",
       });
       // Timeout per permettere all'animazione di scorrimento di funzionare
@@ -78,7 +113,7 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
       ...prev,
       cycles: [
         ...prev.cycles,
-        { id: Date.now(), cycleId: null, startDate: "", endDate: "" },
+        { id: Date.now(), cycleId: null, productId: null, startDate: "", endDate: "" },
       ],
     }));
   };
@@ -99,7 +134,11 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
     const cycleToUpdate = { ...updatedCycles[index] };
 
     if (field === "cycleId") {
+      // selezionando una nuova attività resettiamo il prodotto associato
       cycleToUpdate.cycleId = value ? parseInt(value, 10) : null;
+      cycleToUpdate.productId = null;
+    } else if (field === "productId") {
+      cycleToUpdate.productId = value ? parseInt(value, 10) : null;
     } else {
       cycleToUpdate[field] = value;
     }
@@ -115,9 +154,9 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleSave = (): void => {
-    const isValid = program.cycles.every((c) => c.cycleId !== null);
+    const isValid = program.cycles.every((c) => c.cycleId !== null && c.productId !== null);
     if (program.cycles.length === 0 || !isValid) {
-      alert("Per favore, seleziona un'attività per ogni ciclo aggiunto.");
+      alert("Per favore, seleziona un'attività e un prodotto per ogni ciclo aggiunto.");
       return;
     }
     onSave(program);
@@ -131,6 +170,17 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
   ): string | number => {
     if (cycleId === null) return "N/A";
     const found = AVAILABLE_CYCLES.find((c) => c.id === cycleId);
+    return found ? found[infoKey] : "N/A";
+  };
+
+  const getProductInfo = (
+    productId: number | null,
+    cycleId: number | null,
+    infoKey: keyof Product = "sessions"
+  ): string | number => {
+    if (productId === null || cycleId === null) return "N/A";
+    const products = PRODUCTS_BY_CYCLE[cycleId] || [];
+    const found = products.find((p) => p.id === productId);
     return found ? found[infoKey] : "N/A";
   };
 
@@ -215,43 +265,98 @@ const ProgramModal: FC<ProgramModalProps> = ({ isOpen, onClose, onSave }) => {
                       </select>
                       {cycle.cycleId && (
                         <p className="text-xs text-gray-500 mt-1">
-                          Numero sedute previste:{" "}
-                          {getCycleInfo(cycle.cycleId, "sessions")}
+                          {/* Numero sedute previste attività:{" "} */}
+                          {/* {getCycleInfo(cycle.cycleId, "sessions")} */}
                         </p>
                       )}
                     </div>
+
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-600">
-                        Periodo Previsto (opzionale)
+                        Seleziona Prodotto / Pacchetto *
                       </label>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="date"
-                          value={cycle.startDate}
-                          onChange={(e) =>
-                            handleCycleChange(
-                              index,
-                              "startDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
-                        />
-                        <span className="text-gray-500">-</span>
-                        <input
-                          type="date"
-                          value={cycle.endDate}
-                          onChange={(e) =>
-                            handleCycleChange(index, "endDate", e.target.value)
-                          }
-                          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
-                        />
-                      </div>
+
+                      {/* Mostra il select dei prodotti solo dopo aver scelto l'attività */}
+                      {cycle.cycleId ? (
+                        <div>
+                          <select
+                            id={`product-select-${cycle.id}`}
+                            value={cycle.productId || ""}
+                            onChange={(e) =>
+                              handleCycleChange(
+                                index,
+                                "productId",
+                                e.target.value
+                              )
+                            }
+                            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
+                          >
+                            <option value="" disabled>
+                              Scegli un prodotto/pacchetto...
+                            </option>
+                            {(PRODUCTS_BY_CYCLE[cycle.cycleId] || []).map(
+                              (p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name}
+                                </option>
+                              )
+                            )}
+                          </select>
+
+                          {cycle.productId && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Sedute incluse nel pacchetto:{" "}
+                              {getProductInfo(
+                                cycle.productId,
+                                cycle.cycleId,
+                                "sessions"
+                              )}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Seleziona prima l'attività per scegliere i prodotti
+                          disponibili.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Periodo inputs (spostati qui per mantenere layout) */}
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Inizio (opzionale)
+                      </label>
+                      <input
+                        type="date"
+                        value={cycle.startDate}
+                        onChange={(e) =>
+                          handleCycleChange(index, "startDate", e.target.value)
+                        }
+                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Fine (opzionale)
+                      </label>
+                      <input
+                        type="date"
+                        value={cycle.endDate}
+                        onChange={(e) =>
+                          handleCycleChange(index, "endDate", e.target.value)
+                        }
+                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#8c2d52] focus:border-[#8c2d52]"
+                      />
                       <p className="text-xs text-gray-500 mt-1">
-                        Lasciare vuoto per massima flessibilità.
+                        Periodo Previsto (opzionale) e note specifiche per il
+                        ciclo.
                       </p>
                     </div>
                   </div>
+
                   <div className="text-right mt-3">
                     <button
                       onClick={() => removeCycle(index)}
