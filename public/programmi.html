@@ -28,14 +28,14 @@
                     <path d="m6 9 6 6 6-6" />
                 </svg>`,
             calendar: `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-gray-400">
                     <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
                     <line x1="16" x2="16" y1="2" y2="6" />
                     <line x1="8" x2="8" y1="2" y2="6" />
                     <line x1="3" x2="21" y1="10" y2="10" />
                 </svg>`,
             hash: `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-gray-400">
                     <line x1="4" y1="9" x2="20" y2="9" />
                     <line x1="4" y1="15" x2="20" y2="15" />
                     <line x1="10" y1="3" x2="8" y2="21" />
@@ -45,6 +45,17 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-700">
                     <path d="m12 19-7-7 7-7" />
                     <path d="M19 12H5" />
+                </svg>`,
+            clock: `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-gray-400">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>`,
+            box: `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-gray-400">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
                 </svg>`
         };
 
@@ -53,29 +64,33 @@
             {
                 id: 1,
                 name: 'Programma riabilitativo 2024 #0916',
-                patient: 'Anna Bianchi',
                 status: 'In scadenza',
                 type: 'Programma',
+                accessCode: 'A00234',
                 cycles: [
                     {
                         id: 101,
                         name: '1° Ciclo Fisioterapia',
                         sessionsCount: 10,
+                        sessionDuration: '45 min',
+                        package: 'Fisioterapia Base',
                         startDate: '26 Ago 2024',
                         endDate: '20 Set 2024',
                         status: 'In scadenza',
                         sessions: [
-                            { id: 1001, date: '26/08/2024', time: '10:30', terapista: 'Mario Rossi', status: 'Eseguita' },
-                            { id: 1002, date: '28/08/2024', time: '11:00', terapista: 'Elena Verdi', status: 'Eseguita' },
-                            { id: 1003, date: '30/08/2024', time: '09:00', terapista: 'Mario Rossi', status: 'Programmata' },
-                            { id: 1004, date: '02/09/2024', time: '10:30', terapista: 'Elena Verdi', status: 'Da riprogrammare' },
-                            { id: 1005, date: '04/09/2024', time: '14:00', terapista: 'Mario Rossi', status: 'Annullata' },
+                            { id: 1001, date: '26/08/2024', time: '10:30', endTime: '11:15', terapista: 'Mario Rossi', status: 'Eseguita' },
+                            { id: 1002, date: '28/08/2024', time: '11:00', endTime: '11:45', terapista: 'Elena Verdi', status: 'Eseguita' },
+                            { id: 1003, date: '30/08/2024', time: '09:00', endTime: '09:45', terapista: 'Mario Rossi', status: 'Programmata' },
+                            { id: 1004, date: '02/09/2024', time: '10:30', endTime: '11:15', terapista: 'Elena Verdi', status: 'Da riprogrammare' },
+                            { id: 1005, date: '04/09/2024', time: '14:00', endTime: '14:45', terapista: 'Mario Rossi', status: 'Annullata' },
                         ]
                     },
                     {
                         id: 102,
                         name: '2° Ciclo Terapia Occupazionale',
                         sessionsCount: 8,
+                        sessionDuration: '60 min',
+                        package: 'T.O. Completa',
                         startDate: '23 Set 2024',
                         endDate: '18 Ott 2024',
                         status: 'Da programmare',
@@ -86,19 +101,21 @@
             {
                 id: 2,
                 name: 'Progetto riabilitativo #02819',
-                patient: 'Marco Rossi',
                 status: 'In corso',
-                type: 'PRI',
+                type: 'Programma PRI',
+                accessCode: 'A00118',
                 cycles: [
                      {
                         id: 201,
                         name: 'Ciclo unico Logopedia',
                         sessionsCount: 12,
+                        sessionDuration: '50 min',
+                        package: 'Logopedia Intensiva',
                         startDate: '01 Set 2024',
                         endDate: '15 Ott 2024',
                         status: 'In corso',
                         sessions: [
-                            { id: 2001, date: '01/09/2024', time: '15:00', terapista: 'Laura Bianchi', status: 'Eseguita' },
+                            { id: 2001, date: '01/09/2024', time: '15:00', endTime: '15:50', terapista: 'Laura Bianchi', status: 'Eseguita' },
                         ]
                     }
                 ]
@@ -106,9 +123,9 @@
              {
                 id: 3,
                 name: 'Programma Mantenimento #0815',
-                patient: 'Giulia Neri',
                 status: 'Completato',
                 type: 'Programma',
+                accessCode: 'A00097',
                 cycles: []
             }
         ];
@@ -141,7 +158,10 @@
                                 <span class="text-xs font-semibold bg-gray-200 text-gray-700 px-2 py-1 rounded-md mr-3">${program.type}</span>
                                 <h2 class="font-semibold text-lg text-gray-900">${program.name}</h2>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">Paziente: ${program.patient}</p>
+                            <div class="flex items-center text-sm text-gray-500 mt-2 space-x-6">
+                                <p><span class="font-medium text-gray-600">Codice Accesso:</span> ${program.accessCode}</p>
+                                <p><span class="font-medium text-gray-600">Cicli:</span> ${program.cycles.length}</p>
+                            </div>
                         </div>
                         <div class="flex items-center">
                             ${getStatusBadge(program.status)}
@@ -161,11 +181,11 @@
                                         <span>${cycle.sessionsCount} sedute</span>
                                     </div>
                                     <div class="flex items-center mr-6 mb-2">
-                                        ${icons.calendar}
+                                        <div class="flex items-center mr-2">${icons.calendar}</div>
                                         <span>Inizio: ${cycle.startDate}</span>
                                     </div>
                                     <div class="flex items-center mb-2">
-                                        ${icons.calendar}
+                                        <div class="flex items-center mr-2">${icons.calendar}</div>
                                         <span>Fine: ${cycle.endDate}</span>
                                     </div>
                                 </div>
@@ -180,7 +200,7 @@
                    Dashboard / Pazienti / Trattamenti
                 </div>
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-gray-800">Trattamento #00021</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">Programmi</h1>
                     <button class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-red-700 transition-colors">
                         + Nuovo programma
                     </button>
@@ -193,7 +213,7 @@
              const sessionsHtml = cycle.sessions.length > 0 ? cycle.sessions.map(session => `
                 <tr class="bg-white border-b hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-900">${session.date}</td>
-                    <td class="px-6 py-4">${session.time}</td>
+                    <td class="px-6 py-4">${session.time} - ${session.endTime}</td>
                     <td class="px-6 py-4">${session.terapista}</td>
                     <td class="px-6 py-4">${getStatusBadge(session.status)}</td>
                 </tr>
@@ -217,16 +237,50 @@
                         </button>
                         <div>
                             <h1 class="text-2xl font-bold text-gray-800">${cycle.name}</h1>
-                            <p class="text-gray-500">Lista delle sedute programmate</p>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 flex items-center">
+                            ${icons.hash}
+                            <div>
+                                <p class="text-sm text-gray-500">N. Sedute</p>
+                                <p class="font-bold text-gray-800">${cycle.sessionsCount}</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 flex items-center">
+                            ${icons.clock}
+                            <div>
+                                <p class="text-sm text-gray-500">Durata Seduta</p>
+                                <p class="font-bold text-gray-800">${cycle.sessionDuration}</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 flex items-center col-span-1 md:col-span-2 lg:col-span-1">
+                            ${icons.calendar}
+                            <div>
+                                <p class="text-sm text-gray-500">Periodo</p>
+                                <p class="font-bold text-gray-800 text-sm">${cycle.startDate} - ${cycle.endDate}</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 flex items-center">
+                            ${icons.box}
+                            <div>
+                                <p class="text-sm text-gray-500">Pacchetto</p>
+                                <p class="font-bold text-gray-800">${cycle.package}</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                           <h2 class="text-lg font-semibold text-gray-800">Lista delle sedute programmate</h2>
+                        </div>
                         <div class="overflow-x-auto">
                              <table class="w-full text-sm text-left text-gray-600">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Data</th>
-                                        <th scope="col" class="px-6 py-3">Ora</th>
+                                        <th scope="col" class="px-6 py-3">Orario</th>
                                         <th scope="col" class="px-6 py-3">Terapista</th>
                                         <th scope="col" class="px-6 py-3">Stato</th>
                                     </tr>
@@ -262,11 +316,8 @@
                 }
             }
 
-            if (selectedCycle && selectedCycle.sessions.length > 0) {
+            if (selectedCycle) { // Mostra la pagina anche se non ci sono sedute
                 renderCycleDetailsPage(selectedCycle);
-            } else {
-                 console.log("Questo ciclo non ha sedute da visualizzare.");
-                 // Potresti mostrare un avviso all'utente qui
             }
         }
         
